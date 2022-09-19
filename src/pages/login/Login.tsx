@@ -1,11 +1,11 @@
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { Button, Grid, IconButton, Input, InputAdornment, Link } from '@mui/material'
 import { makeStyles } from '@mui/styles';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo.png'
-
-//#ffa500 orange color
+import logo from '../../assets/logo.png';
+import { useQuery } from '@apollo/client/react';
+import { LOGIN } from '../../queries';
 
 const useStyles = makeStyles({
   root: {
@@ -25,6 +25,7 @@ const useStyles = makeStyles({
   },
   input: {
     margin: '15px',
+    width: "85%"
   },
   link: {
     margin: '15px',
@@ -38,7 +39,7 @@ const useStyles = makeStyles({
 })
 
 interface Credentials {
-  username: string,
+  email: string,
   password: string,
   showPassword: boolean
 }
@@ -48,15 +49,18 @@ const Login = () => {
   const classes = useStyles()
   const navigate = useNavigate()
   const [credentials, setCredentials] = useState<Credentials>({
-    username: '',
-    password: '',
+    email: "",
+    password: "",
     showPassword: false,
   })
+  const { loading, error, data } = useQuery(LOGIN, {
+    variables: { email: credentials.email, password: credentials.password }
+  },);
 
   const handleChange =
     (prop: keyof Credentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setCredentials({ ...credentials, [prop]: event.target.value });
-    };
+  };
 
   const handleClickShowPassword = () => {
     setCredentials({
@@ -73,6 +77,18 @@ const Login = () => {
     navigate("/sign-up")
   }
 
+  const handleLogin = () => {
+    console.log(data)
+    if(loading) {
+      //TODO: HANDLE LOADING
+    } else if(error){
+      //TODO: HANDLE WRONG EMAIL OR PASSWORD
+    } else if(data.loginVendor != null){
+      navigate("/synchronisation")
+    }
+  }
+
+  console.log(credentials)
   return(
     <Grid 
       container
@@ -85,14 +101,16 @@ const Login = () => {
         <Input
           className={classes.input}
           color="warning"
-          placeholder="Username"
-          value={credentials.password}
-          onChange={handleChange('username')}/>
+          placeholder="Email"
+          value={credentials.email}
+          onChange={handleChange('email')}/>
         <Input 
           className={classes.input}
           color="warning"
           placeholder="Password"
-          type={credentials.showPassword ? 'text' : 'password'}
+          type={
+            credentials.showPassword ? 'text' : 
+            'password'}
           value={credentials.password}
           onChange={handleChange('password')}
           endAdornment={
@@ -104,10 +122,12 @@ const Login = () => {
                 {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
-          }/>
+          }
+          />
         <Button 
           variant="contained" 
-          style={{ background: '#ffa500', margin: '15px'}}>
+          style={{ background: '#ffa500', margin: '15px'}}
+          onClick={handleLogin}>
             LOG IN
         </Button>
         {/* <Typography className={classes.input} display="inline-block">

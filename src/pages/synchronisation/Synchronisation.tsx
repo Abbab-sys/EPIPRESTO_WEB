@@ -1,4 +1,4 @@
-import { Grid, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Button, Grid, Input, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import shopify_logo from '../../assets/shopify_logo.png'
 import woocommerce_logo from '../../assets/woocommerce_logo.png'
@@ -20,16 +20,21 @@ const useStyles = makeStyles({
     background: 'white',
   },
   api: {
-    // height: "100px",
-    // width: "100px",
+    '&.Mui-selected': {
+      background: 'linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25)) !important'
+      // background: '#ffa500 !important'
+    }
+  },
+  input: {
+    margin: '15px'
   }
 })
 
 const Synchronisation = () => {
 
   const classes = useStyles();
-
-  const [alignment, setAlignment] = useState<string | null>('left');
+  const [apiURL, setApiURL] = useState('');
+  const [alignment, setAlignment] = useState<string | null>('SHOPIFY');
 
   const handleAlignment = (
     event: React.MouseEvent<HTMLElement>,
@@ -38,25 +43,47 @@ const Synchronisation = () => {
     setAlignment(newAlignment);
   };
 
+  const handleURLChange =
+    () => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setApiURL(event.target.value);
+  };
+
   return(
     <Grid
       container
       xs={12} 
       spacing={0}
-      direction="column">
+      direction="column"
+      className={classes.root}>
       <Grid item xs={3} className={classes.form} direction="column">
+        {/* <Grid item> */}
+
         <ToggleButtonGroup 
           value={alignment}
           exclusive
           onChange={handleAlignment}
-          color="primary">
-          <ToggleButton value="shopify" className={classes.api}>
+          color="error"
+          style={{ margin: '15px'}}
+          >
+          <ToggleButton defaultChecked value="SHOPIFY" className={classes.api}>
             <img src={shopify_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
-          <ToggleButton value="woocomerce" className={classes.api}>
+          <ToggleButton value="WOOCOMMERCE" className={classes.api}>
             <img src={woocommerce_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
-        </ToggleButtonGroup>
+            {/* </Grid> */}
+          </ToggleButtonGroup>
+          <Input
+            color="warning"
+            placeholder="API URL"
+            onChange={handleURLChange}
+            className={classes.input}
+          ></Input>
+          <Button
+            variant="contained" 
+            style={{ background: '#ffa500', margin: '15px'}}>
+            SYNCHRONISE
+          </Button>
       </Grid>
     </Grid>
   )

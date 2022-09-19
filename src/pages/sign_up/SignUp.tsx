@@ -2,6 +2,8 @@ import { Button, Grid, Input, styled, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
+import { useMutation } from '@apollo/client'
+import { SIGN_UP } from '../../mutations';
 
 const useStyles = makeStyles({
   root: {
@@ -38,61 +40,46 @@ const useStyles = makeStyles({
   }
 })
 
-const CssTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: 'green',
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      bottomBorderColor: 'red',
-    },
-    '&:hover fieldset': {
-      bottomBorderColor: '#ffa500',
-    },
-    '&.Mui-focused fieldset': {
-      bottomBorderColor: '#ffa500',
-    },
-  },
-});
-
-interface State {
+interface AccountInput {
   shopName: string;
-  userName: string;
-  address: string;
   email: string;
+  address: string;
   phone: string;
+  username: string;
   password: string;
-  showPassword: boolean;
 }
+
+// "accountInput": {
+//   "shopName": null,
+//   "address": null,
+//   "email": null,
+//   "phone": null,
+//   "username": null,
+//   "password": null
+// }
 
 const SignUp = () => {
 
   const classes = useStyles()
-  const [values, setValues] = useState<State>({
+  const [accountInput, setAccountInput] = useState<AccountInput>({
     shopName: '',
-    userName: '',
+    username: '',
     address: '',
     email: '',
     phone: '',
-    password: '',
-    showPassword: false,
+    password: ''
   });
 
+  const [signUp, { loading, error, data }] = useMutation(SIGN_UP);
+
   const handleChange =
-    (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [prop]: event.target.value });
+    (prop: keyof AccountInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setAccountInput({ ...accountInput, [prop]: event.target.value });
     };
 
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
-    });
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  if(error) console.log(error)
+  if(data !== null) console.log(data)
+  console.log(accountInput)
 
   return(
     <Grid 
@@ -103,27 +90,60 @@ const SignUp = () => {
       className={classes.root}>
       <Grid container xs={4} className={classes.form} direction="column">
         <img src={logo} height={"80px"} width={"200px"}></img>
-        <Input color="warning" style={{ width: "100%", maxWidth: "-webkit-fill-available" }} className={classes.input} placeholder="Shop name" 
-        value={values.shopName} onChange={handleChange('shopName')}/>
+        <Input 
+          color="warning" 
+          style={{ width: "100%", maxWidth: "-webkit-fill-available" }} 
+          className={classes.input} 
+          placeholder="Shop name" 
+          value={accountInput.shopName} 
+          onChange={handleChange('shopName')}
+        />
         <Grid item direction="row" className={classes.innerForm}>
-          <Input className={classes.input} color="warning" placeholder="Username" value={values.userName} onChange={handleChange('userName')}/>
-          <Input className={classes.input} color="warning" placeholder="Address" value={values.address} onChange={handleChange('address')}/>
+          <Input 
+            className={classes.input} 
+            color="warning" 
+            placeholder="Username" 
+            value={accountInput.username} 
+            onChange={handleChange('username')}
+          />
+          <Input 
+            className={classes.input}
+            color="warning"
+            placeholder="Address"
+            value={accountInput.address}
+            onChange={handleChange('address')}
+          />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
-          <Input className={classes.input} color="warning" placeholder="Email" value={values.email} onChange={handleChange('email')}/>
-          <Input className={classes.input} color="warning" placeholder="Phone" value={values.phone} onChange={handleChange('phone')}/>
+          <Input 
+            className={classes.input}
+            color="warning"
+            placeholder="Email"
+            value={accountInput.email}
+            onChange={handleChange('email')}
+          />
+          <Input
+            className={classes.input}
+            color="warning"
+            placeholder="Phone"
+            value={accountInput.phone}
+            onChange={handleChange('phone')}
+          />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
           <Input 
             className={classes.input}
             color="warning"
             placeholder="Password"
-            type={values.showPassword ? 'text' : 'password'}
-            value={values.password}
+            type={'password'}
+            value={accountInput.password}
             onChange={handleChange('password')}/>
           <Input className={classes.input} color="warning" placeholder="Confirm Password"/>
         </Grid>
-        <Button variant="contained" style={{ background: '#ffa500', margin: '15px'}}>
+        <Button 
+          variant="contained" 
+          style={{ background: '#ffa500', margin: '15px'}}
+          onClick={() => signUp({ variables: { accountInput: accountInput } })}>
             Create account
         </Button>
       </Grid>
