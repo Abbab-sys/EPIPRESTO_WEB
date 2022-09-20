@@ -1,11 +1,12 @@
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { Button, Grid, IconButton, Input, InputAdornment, Link } from '@mui/material'
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useQuery } from '@apollo/client/react';
 import { LOGIN } from '../../queries';
+import { VendorContext } from '../../context/Vendor';
 
 const useStyles = makeStyles({
   root: {
@@ -48,6 +49,7 @@ const Login = () => {
 
   const classes = useStyles()
   const navigate = useNavigate()
+  const state = useContext(VendorContext)
   const [credentials, setCredentials] = useState<Credentials>({
     email: "",
     password: "",
@@ -83,12 +85,14 @@ const Login = () => {
       //TODO: HANDLE LOADING
     } else if(error){
       //TODO: HANDLE WRONG EMAIL OR PASSWORD
+      console.log(error)
     } else if(data.loginVendor != null){
+      state.setStoreId(data.loginVendor.store._id)
+      console.log(data.loginVendor.store._id)
       navigate("/synchronisation")
     }
   }
 
-  console.log(credentials)
   return(
     <Grid 
       container
@@ -132,7 +136,7 @@ const Login = () => {
         </Button>
         {/* <Typography className={classes.input} display="inline-block">
           New to Épipresto? */}
-          <Link className={classes.link} onClick={handleCreateAccount}>
+          <Link style={{ margin: '15px'}} className={classes.link} onClick={handleCreateAccount}>
             {'Create an account'}
           </Link>
         {/* </Typography> */}

@@ -1,26 +1,18 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import Login from './pages/login/Login';
-import Synchronisation from './pages/synchronisation/Synchronisation';
 import App from './App';
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { VendorContext } from './context/Vendor';
 
-const password = "HemyQ1mDUr2xlUc7"
-const uri = "mongodb+srv://Epipresto:" + password + "@epipresto.q5xhal9.mongodb.net/?retryWrites=true&w=majority/";
-const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
-  cache: new InMemoryCache(),
-});
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <App />
-    </ApolloProvider>
+    <App />
   </React.StrictMode>
 );
 

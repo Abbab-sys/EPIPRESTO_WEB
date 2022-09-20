@@ -4,6 +4,7 @@ import { useState } from 'react';
 import logo from '../../assets/logo.png';
 import { useMutation } from '@apollo/client'
 import { SIGN_UP } from '../../mutations';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -49,18 +50,10 @@ interface AccountInput {
   password: string;
 }
 
-// "accountInput": {
-//   "shopName": null,
-//   "address": null,
-//   "email": null,
-//   "phone": null,
-//   "username": null,
-//   "password": null
-// }
-
 const SignUp = () => {
 
   const classes = useStyles()
+  const navigate = useNavigate()
   const [accountInput, setAccountInput] = useState<AccountInput>({
     shopName: '',
     username: '',
@@ -76,10 +69,19 @@ const SignUp = () => {
     (prop: keyof AccountInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setAccountInput({ ...accountInput, [prop]: event.target.value });
     };
-
-  if(error) console.log(error)
-  if(data !== null) console.log(data)
-  console.log(accountInput)
+  
+  const handleCreateAccount = () => {
+    signUp({ variables: { accountInput: accountInput } })
+    console.log(data)
+    if(loading) {
+      //TODO: HANDLE LOADING
+    } else if(error){
+      //TODO: HANDLE WRONG EMAIL OR PASSWORD
+      console.log(error)
+    } else if(data.vendorSignUp != null){
+      navigate("/login")
+    }
+  }
 
   return(
     <Grid 
@@ -138,12 +140,16 @@ const SignUp = () => {
             type={'password'}
             value={accountInput.password}
             onChange={handleChange('password')}/>
-          <Input className={classes.input} color="warning" placeholder="Confirm Password"/>
+          <Input 
+            className={classes.input}
+            color="warning"
+            type={'password'}
+            placeholder="Confirm Password"/>
         </Grid>
         <Button 
-          variant="contained" 
+          variant="contained"
           style={{ background: '#ffa500', margin: '15px'}}
-          onClick={() => signUp({ variables: { accountInput: accountInput } })}>
+          onClick={handleCreateAccount}>
             Create account
         </Button>
       </Grid>

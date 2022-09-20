@@ -1,8 +1,11 @@
-import { Button, Grid, Input, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Button, Grid, Input, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import shopify_logo from '../../assets/shopify_logo.png'
-import woocommerce_logo from '../../assets/woocommerce_logo.png'
-import React, { useState } from 'react'
+import shopify_logo from '../../assets/shopify_logo.png';
+import woocommerce_logo from '../../assets/woocommerce_logo.png';
+import React, { useState, useContext } from 'react';
+import { useMutation } from '@apollo/client';
+import { SYNCH_SHOPIFY } from '../../mutations';
+import { VendorContext } from '../../context/Vendor';
 
 const useStyles = makeStyles({
   root: {
@@ -22,30 +25,48 @@ const useStyles = makeStyles({
   api: {
     '&.Mui-selected': {
       background: 'linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25)) !important'
-      // background: '#ffa500 !important'
     }
   },
   input: {
-    margin: '15px'
+    margin: '15px',
+    width: "87%"
   }
 })
+
+enum ApiType {
+  SHOPIFY="SHOPIFY",
+  WOOCOMMERCE="WOOCOMMERCE"
+}
+
+interface SynchronizeInput {
+  apiToken: string,
+  shopDomain: string
+}
 
 const Synchronisation = () => {
 
   const classes = useStyles();
-  const [apiURL, setApiURL] = useState('');
-  const [alignment, setAlignment] = useState<string | null>('SHOPIFY');
+  const { storeId, setStoreId } = useContext(VendorContext)
+  const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY)
+  const [synchronizeInput, setSynchronizeInput] = useState<SynchronizeInput>({
+    apiToken: '',
+    shopDomain: ''
+  });
+  const [synchronize, { loading, error, data }] = useMutation(SYNCH_SHOPIFY);
 
-  const handleAlignment = (
+  const handleApi = () => (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+    api: ApiType,
   ) => {
-    setAlignment(newAlignment);
+    console.log(api)
+    if(api !== null){
+      setApiType(api);
+    }
   };
 
-  const handleURLChange =
-    () => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setApiURL(event.target.value);
+  const handleChange = (prop: keyof SynchronizeInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    if(prop === 'apiToken') setStoreId(event.target.value)
+    setSynchronizeInput({ ...synchronizeInput, [prop]: event.target.value });
   };
 
   return(
@@ -56,32 +77,43 @@ const Synchronisation = () => {
       direction="column"
       className={classes.root}>
       <Grid item xs={3} className={classes.form} direction="column">
-        {/* <Grid item> */}
-
         <ToggleButtonGroup 
-          value={alignment}
+          value={apiType}
           exclusive
-          onChange={handleAlignment}
-          color="error"
+          onChange={handleApi()}
           style={{ margin: '15px'}}
           >
-          <ToggleButton defaultChecked value="SHOPIFY" className={classes.api}>
+          <ToggleButton defaultChecked value={ApiType.SHOPIFY} className={classes.api}>
             <img src={shopify_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
-          <ToggleButton value="WOOCOMMERCE" className={classes.api}>
+          <ToggleButton value={ApiType.WOOCOMMERCE} className={classes.api}>
             <img src={woocommerce_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
-            {/* </Grid> */}
           </ToggleButtonGroup>
           <Input
             color="warning"
-            placeholder="API URL"
-            onChange={handleURLChange}
+            placeholder="API Token"
+            value={synchronizeInput.apiToken}
+            onChange={handleChange('apiToken')}
             className={classes.input}
           ></Input>
+          {apiType === ApiType.SHOPIFY &&(
+            <Input
+              color="warning"
+              placeholder="Domain name"
+              value={synchronizeInput.shopDomain}
+              onChange={handleChange('shopDomain')}
+              className={classes.input}
+              ></Input>
+          )}
           <Button
             variant="contained" 
-            style={{ background: '#ffa500', margin: '15px'}}>
+            style={{ background: '#ffa500', margin: '15px'}}
+            onClick={() => 
+              synchronize({
+                variables: { shopifyCreds : synchronizeInput } 
+              })
+            }>
             SYNCHRONISE
           </Button>
       </Grid>
