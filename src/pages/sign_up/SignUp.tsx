@@ -50,10 +50,31 @@ interface AccountInput {
   password: string;
 }
 
+interface ErrorMessage {
+  shopNameError: string;
+  emailError: string;
+  addressError: string;
+  phoneError: string;
+  usernameError: string;
+  passwordError: string;
+  verifyPasswordError: string;
+}
+
+const initialErrorState: ErrorMessage = {
+  shopNameError: '',
+  emailError: '',
+  addressError: '',
+  phoneError: '',
+  usernameError: '',
+  passwordError: '',
+  verifyPasswordError: ''
+}
+
 const SignUp = () => {
 
   const classes = useStyles()
   const navigate = useNavigate()
+  const [verifyPassword, setVerifyPassword] = useState<string>('')
   const [accountInput, setAccountInput] = useState<AccountInput>({
     shopName: '',
     username: '',
@@ -63,24 +84,52 @@ const SignUp = () => {
     password: ''
   });
 
+
+  const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
+
   const [signUp, { loading, error, data }] = useMutation(SIGN_UP);
 
   const handleChange =
     (prop: keyof AccountInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setAccountInput({ ...accountInput, [prop]: event.target.value });
     };
+
+  const handleErrorChange =
+    (prop: keyof ErrorMessage, message: string) => {
+      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [prop]: message }));
+    };
+
+  const handleVerifyPasswordChange = () => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVerifyPassword(event.target.value)
+  }
+
+  const isValid = () => {
+    setErrorMessage(initialErrorState);
+    let isAllValid = true
+    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", "Veuillez remplir le nom de votre magasin"); isAllValid = false}
+    if(accountInput.username.length === 0) {handleErrorChange("usernameError", "Veuillez remplir un pseudonyme"); isAllValid = false}
+    if(accountInput.address.length === 0) {handleErrorChange("addressError", "Veuillez remplir l'adresse de votre magasin"); isAllValid = false}
+    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", "Veuillez remplir votre numéro de téléphone"); isAllValid = false}
+    if(accountInput.email.length === 0) {handleErrorChange("emailError", "Veuillez remplir votre email"); isAllValid = false}
+    if(accountInput.password.length === 0) {handleErrorChange("passwordError", "Veuillez remplir un mot de passe"); isAllValid = false}
+    if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", "Le mot de passe de confirmation n'a pas le même mot de passe"); isAllValid = false}
+    return isAllValid
+  }
   
   const handleCreateAccount = async () => {
-    await signUp({ variables: { accountInput: accountInput } })
-    console.log(data)
-    if(loading) {
-      //TODO: HANDLE LOADING
-    } else if(error){
-      //TODO: HANDLE WRONG EMAIL OR PASSWORD
-      console.log(error)
-    } else if(data != null){
-      navigate("/login")
+    if(isValid()){
+      await signUp({ variables: { accountInput: accountInput } })
+      console.log(data)
+      if(loading) {
+        //TODO: HANDLE LOADING
+      } else if(error){
+        //TODO: HANDLE WRONG EMAIL OR PASSWORD
+        console.log(error)
+      } else if(data != null){
+        navigate("/login")
+      }
     }
+    
   }
 
   return(
@@ -92,59 +141,86 @@ const SignUp = () => {
       className={classes.root}>
       <Grid container xs={4} className={classes.form} direction="column">
         <img src={logo} height={"80px"} width={"200px"}></img>
-        <Input 
-          color="warning" 
+        <TextField
+          variant='standard'
+          color="warning"
           style={{ width: "100%", maxWidth: "-webkit-fill-available" }} 
           className={classes.input} 
           placeholder="Shop name" 
           value={accountInput.shopName} 
           onChange={handleChange('shopName')}
+          error = {errorMessage.shopNameError.length > 0}
+          helperText = {errorMessage.shopNameError}
         />
         <Grid item direction="row" className={classes.innerForm}>
-          <Input 
+          <TextField 
+            variant='standard'
             className={classes.input} 
             color="warning" 
             placeholder="Username" 
             value={accountInput.username} 
             onChange={handleChange('username')}
+            error = {errorMessage.usernameError.length > 0}
+            helperText = {errorMessage.usernameError}
           />
-          <Input 
+          <div>
+          <TextField 
+            variant='standard'
             className={classes.input}
             color="warning"
             placeholder="Address"
             value={accountInput.address}
             onChange={handleChange('address')}
+            error = {errorMessage.addressError.length > 0}
+            helperText = {errorMessage.addressError}
           />
+          </div>
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
-          <Input 
+          <TextField
+            variant='standard'
             className={classes.input}
             color="warning"
             placeholder="Email"
             value={accountInput.email}
             onChange={handleChange('email')}
+            error = {errorMessage.emailError.length > 0}
+            helperText = {errorMessage.emailError}
           />
-          <Input
+          <TextField
+            variant='standard'
             className={classes.input}
             color="warning"
             placeholder="Phone"
             value={accountInput.phone}
             onChange={handleChange('phone')}
+            error = {errorMessage.phoneError.length > 0}
+            helperText = {errorMessage.phoneError}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
-          <Input 
+          <TextField 
+            variant='standard'
             className={classes.input}
             color="warning"
             placeholder="Password"
             type={'password'}
             value={accountInput.password}
-            onChange={handleChange('password')}/>
-          <Input 
+            onChange={handleChange('password')}
+            error = {errorMessage.passwordError.length > 0}
+            helperText = {errorMessage.passwordError}
+            />
+          <TextField 
+            variant='standard'
             className={classes.input}
             color="warning"
             type={'password'}
-            placeholder="Confirm Password"/>
+            value={verifyPassword}
+            placeholder="Confirm Password"
+            onChange={handleVerifyPasswordChange()}
+            error = {errorMessage.verifyPasswordError.length > 0}
+            helperText = {errorMessage.verifyPasswordError}
+            />
         </Grid>
         <Button 
           variant="contained"
