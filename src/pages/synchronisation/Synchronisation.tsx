@@ -48,7 +48,7 @@ const Synchronisation = () => {
   const classes = useStyles();
   const { storeId, setStoreId } = useContext(VendorContext)
   const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY)
-  const [synchronizeInput, setSynchronizeInput] = useState<SynchronizeInput>({
+  const [shopifyCreds, setShopifyCreds] = useState<SynchronizeInput>({
     apiToken: '',
     shopDomain: ''
   });
@@ -65,9 +65,22 @@ const Synchronisation = () => {
   };
 
   const handleChange = (prop: keyof SynchronizeInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    if(prop === 'apiToken') setStoreId(event.target.value)
-    setSynchronizeInput({ ...synchronizeInput, [prop]: event.target.value });
+    setShopifyCreds({ ...shopifyCreds, [prop]: event.target.value });
   };
+
+  const handleSynchronisation = () => {
+    synchronize({ variables: { shopifyCreds : shopifyCreds } })
+    if(loading) {
+      //TODO: HANDLE LOADING
+    } else if(error){
+      //TODO: HANDLE WRONG EMAIL OR PASSWORD
+      console.log(error)
+    } else if(data != null){
+      console.log(data)
+    }
+  }
+
+  console.log(shopifyCreds)
 
   return(
     <Grid
@@ -93,7 +106,7 @@ const Synchronisation = () => {
           <Input
             color="warning"
             placeholder="API Token"
-            value={synchronizeInput.apiToken}
+            value={shopifyCreds.apiToken}
             onChange={handleChange('apiToken')}
             className={classes.input}
           ></Input>
@@ -101,7 +114,7 @@ const Synchronisation = () => {
             <Input
               color="warning"
               placeholder="Domain name"
-              value={synchronizeInput.shopDomain}
+              value={shopifyCreds.shopDomain}
               onChange={handleChange('shopDomain')}
               className={classes.input}
               ></Input>
@@ -109,11 +122,7 @@ const Synchronisation = () => {
           <Button
             variant="contained" 
             style={{ background: '#ffa500', margin: '15px'}}
-            onClick={() => 
-              synchronize({
-                variables: { shopifyCreds : synchronizeInput } 
-              })
-            }>
+            onClick={handleSynchronisation}>
             SYNCHRONISE
           </Button>
       </Grid>

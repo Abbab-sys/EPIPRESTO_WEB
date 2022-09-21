@@ -70,15 +70,15 @@ const SignUp = () => {
       setAccountInput({ ...accountInput, [prop]: event.target.value });
     };
   
-  const handleCreateAccount = () => {
-    signUp({ variables: { accountInput: accountInput } })
+  const handleCreateAccount = async () => {
+    await signUp({ variables: { accountInput: accountInput } })
     console.log(data)
     if(loading) {
       //TODO: HANDLE LOADING
     } else if(error){
       //TODO: HANDLE WRONG EMAIL OR PASSWORD
       console.log(error)
-    } else if(data.vendorSignUp != null){
+    } else if(data != null){
       navigate("/login")
     }
   }
