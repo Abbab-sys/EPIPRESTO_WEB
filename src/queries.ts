@@ -10,3 +10,15 @@ export const LOGIN = gql`
     }
 }
 `
+
+export const IS_VENDOR_USERNAME_USED = gql`
+  query Query($username: String!) {
+    isVendorUsernameUsed(username: $username)
+  }
+`
+
+export const IS_VENDOR_EMAIL_USED = gql`
+  query Query($email: String!) {
+    isVendorEmailUsed(email: $email)
+  }
+`
