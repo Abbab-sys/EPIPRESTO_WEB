@@ -2,9 +2,10 @@ import { Button, Grid, Input, styled, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { SIGN_UP } from '../../mutations';
 import { useNavigate } from 'react-router-dom';
+import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../queries';
 
 const useStyles = makeStyles({
   root: {
@@ -27,9 +28,11 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: "center",
     justifyContent: "center",
+    width: "90%",
+    maxWidth: "-webkit-fill-available"
   },
   input: {
-    margin: '15px',
+    margin: '15px !important',
     // '& .MuiOutlinedInput-root': {
     //   '&:hover': {
     //     color: '#ffa500',
@@ -84,14 +87,24 @@ const SignUp = () => {
     password: ''
   });
 
+  const { loading: emailLoading, error: emailError, data: emailData } = 
+    useQuery(IS_VENDOR_EMAIL_USED, {
+      variables: { email: accountInput.email }
+    },);
+
+  const { loading: usernameLoading, error: usernameError, data: usernameData } = 
+    useQuery(IS_VENDOR_USERNAME_USED, {
+      variables: { username: accountInput.username }
+    },);
 
   const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
 
   const [signUp, { loading, error, data }] = useMutation(SIGN_UP);
 
   const handleChange =
-    (prop: keyof AccountInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setAccountInput({ ...accountInput, [prop]: event.target.value });
+    (accountInputProp: keyof AccountInput, errorMessageProp: keyof ErrorMessage) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [errorMessageProp]: "" }));
+      setAccountInput({ ...accountInput, [accountInputProp]: event.target.value });
     };
 
   const handleErrorChange =
@@ -103,21 +116,36 @@ const SignUp = () => {
     setVerifyPassword(event.target.value)
   }
 
-  const isValid = () => {
+  const isValid = async () => {
     setErrorMessage(initialErrorState);
+    console.log(usernameData)
     let isAllValid = true
-    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", "Veuillez remplir le nom de votre magasin"); isAllValid = false}
-    if(accountInput.username.length === 0) {handleErrorChange("usernameError", "Veuillez remplir un pseudonyme"); isAllValid = false}
-    if(accountInput.address.length === 0) {handleErrorChange("addressError", "Veuillez remplir l'adresse de votre magasin"); isAllValid = false}
-    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", "Veuillez remplir votre numéro de téléphone"); isAllValid = false}
-    if(accountInput.email.length === 0) {handleErrorChange("emailError", "Veuillez remplir votre email"); isAllValid = false}
-    if(accountInput.password.length === 0) {handleErrorChange("passwordError", "Veuillez remplir un mot de passe"); isAllValid = false}
+    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", "Veuillez saisir le nom de votre magasin"); isAllValid = false}
+    if(accountInput.username.length === 0) {handleErrorChange("usernameError", "Veuillez saisir un pseudonyme"); isAllValid = false}
+    else if(usernameLoading) {
+      //TODO: HANDLE LOADING
+    } else if(usernameError) {
+      //TODO: HANDLE ERROR
+    } else if(usernameData.isVendorUsernameUsed) {
+      {handleErrorChange("usernameError", "Ce pseudonyme est déjà utilisé"); isAllValid = false}
+    }
+    if(accountInput.address.length === 0) {handleErrorChange("addressError", "Veuillez saisir l'adresse de votre magasin"); isAllValid = false}
+    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", "Veuillez saisir votre numéro de téléphone"); isAllValid = false}
+    if(accountInput.email.length === 0) {handleErrorChange("emailError", "Veuillez saisir votre email"); isAllValid = false}
+    else if(emailLoading) {
+      //TODO: HANDLE LOADING
+    } else if(emailError) {
+      //TODO: HANDLE ERROR
+    } else if(emailData.isVendorEmailUsed) {
+      {handleErrorChange("emailError", "Cet email est déjà utilisé"); isAllValid = false}
+    }
+    if(accountInput.password.length === 0) {handleErrorChange("passwordError", "Veuillez saisir un mot de passe"); isAllValid = false}
     if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", "Le mot de passe de confirmation n'a pas le même mot de passe"); isAllValid = false}
     return isAllValid
   }
   
   const handleCreateAccount = async () => {
-    if(isValid()){
+    if(await isValid()){
       await signUp({ variables: { accountInput: accountInput } })
       console.log(data)
       if(loading) {
@@ -129,7 +157,6 @@ const SignUp = () => {
         navigate("/login")
       }
     }
-    
   }
 
   return(
@@ -139,16 +166,16 @@ const SignUp = () => {
       spacing={0}
       direction="column"
       className={classes.root}>
-      <Grid container xs={4} className={classes.form} direction="column">
+      <Grid container xs={5} className={classes.form} direction="column">
         <img src={logo} height={"80px"} width={"200px"}></img>
         <TextField
           variant='standard'
           color="warning"
-          style={{ width: "100%", maxWidth: "-webkit-fill-available" }} 
+          style={{ width: "80%", maxWidth: "-webkit-fill-available" }} 
           className={classes.input} 
           placeholder="Shop name" 
           value={accountInput.shopName} 
-          onChange={handleChange('shopName')}
+          onChange={handleChange('shopName', 'shopNameError')}
           error = {errorMessage.shopNameError.length > 0}
           helperText = {errorMessage.shopNameError}
         />
@@ -159,22 +186,20 @@ const SignUp = () => {
             color="warning" 
             placeholder="Username" 
             value={accountInput.username} 
-            onChange={handleChange('username')}
+            onChange={handleChange('username', 'usernameError')}
             error = {errorMessage.usernameError.length > 0}
             helperText = {errorMessage.usernameError}
           />
-          <div>
           <TextField 
             variant='standard'
             className={classes.input}
             color="warning"
             placeholder="Address"
             value={accountInput.address}
-            onChange={handleChange('address')}
+            onChange={handleChange('address', 'addressError')}
             error = {errorMessage.addressError.length > 0}
             helperText = {errorMessage.addressError}
           />
-          </div>
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
           <TextField
@@ -183,7 +208,7 @@ const SignUp = () => {
             color="warning"
             placeholder="Email"
             value={accountInput.email}
-            onChange={handleChange('email')}
+            onChange={handleChange('email', 'emailError')}
             error = {errorMessage.emailError.length > 0}
             helperText = {errorMessage.emailError}
           />
@@ -193,7 +218,7 @@ const SignUp = () => {
             color="warning"
             placeholder="Phone"
             value={accountInput.phone}
-            onChange={handleChange('phone')}
+            onChange={handleChange('phone', 'phoneError')}
             error = {errorMessage.phoneError.length > 0}
             helperText = {errorMessage.phoneError}
           />
@@ -206,7 +231,7 @@ const SignUp = () => {
             placeholder="Password"
             type={'password'}
             value={accountInput.password}
-            onChange={handleChange('password')}
+            onChange={handleChange('password', 'passwordError')}
             error = {errorMessage.passwordError.length > 0}
             helperText = {errorMessage.passwordError}
             />
