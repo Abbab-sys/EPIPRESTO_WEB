@@ -1,5 +1,5 @@
 import { VisibilityOff, Visibility } from '@mui/icons-material';
-import { Button, Grid, IconButton, Input, InputAdornment, Link } from '@mui/material'
+import { Button, Grid, IconButton, Input, InputAdornment, Link, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +45,16 @@ interface Credentials {
   showPassword: boolean
 }
 
+interface ErrorMessage {
+  emailError:string;
+  passwordError:string;
+}
+
+const initialErrorState: ErrorMessage = {
+  emailError: '',
+  passwordError: '',
+}
+
 const Login = () => {
 
   const classes = useStyles()
@@ -55,6 +65,7 @@ const Login = () => {
     password: "",
     showPassword: false,
   })
+
   const { loading, error, data } = useQuery(LOGIN, {
     variables: { email: credentials.email, password: credentials.password }
   },);
@@ -63,6 +74,13 @@ const Login = () => {
     (prop: keyof Credentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setCredentials({ ...credentials, [prop]: event.target.value });
   };
+
+  const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
+
+  const handleErrorChange =
+    (prop: keyof ErrorMessage, message: string) => {
+      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [prop]: message }));
+    };
 
   const handleClickShowPassword = () => {
     setCredentials({
@@ -79,17 +97,27 @@ const Login = () => {
     navigate("/sign-up")
   }
 
+  const isValid = () => {
+    setErrorMessage(initialErrorState);
+    let isAllValid = true
+    if(credentials.email.length === 0) {handleErrorChange("emailError", "Veuillez remplir votre email"); isAllValid = false}
+    if(credentials.password.length === 0) {handleErrorChange("passwordError", "Veuillez remplir votre mot de passe"); isAllValid = false}
+    return isAllValid
+  }
+
   const handleLogin = () => {
     console.log(data)
-    if(loading) {
-      //TODO: HANDLE LOADING
-    } else if(error){
-      //TODO: HANDLE WRONG EMAIL OR PASSWORD
-      console.log(error)
-    } else if(data.loginVendor != null){
-      state.setStoreId(data.loginVendor.store._id)
-      console.log(data.loginVendor.store._id)
-      navigate("/synchronisation")
+    if(isValid()){
+      if(loading) {
+        //TODO: HANDLE LOADING
+      } else if(error){
+        //TODO: HANDLE WRONG EMAIL OR PASSWORD
+        console.log(error)
+      } else if(data.loginVendor != null){
+        state.setStoreId(data.loginVendor.store._id)
+        console.log(data.loginVendor.store._id)
+        navigate("/synchronisation")
+      }
     }
   }
 
@@ -102,13 +130,18 @@ const Login = () => {
       className={classes.root}>
       <Grid item xs={3} className={classes.form} direction="column">
         <img src={logo} height={"80px"} width={"200px"}></img>
-        <Input
+        <TextField
+          variant='standard'
           className={classes.input}
           color="warning"
           placeholder="Email"
           value={credentials.email}
-          onChange={handleChange('email')}/>
-        <Input 
+          onChange={handleChange('email')}
+          error = {errorMessage.emailError.length > 0}
+          helperText = {errorMessage.emailError}
+          />
+        <TextField
+          variant='standard'
           className={classes.input}
           color="warning"
           placeholder="Password"
@@ -117,16 +150,18 @@ const Login = () => {
             'password'}
           value={credentials.password}
           onChange={handleChange('password')}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-              >
-                {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
+          error = {errorMessage.passwordError.length > 0}
+          helperText = {errorMessage.passwordError}
+          // endAdornment={
+          //   <InputAdornment position="end">
+          //     <IconButton
+          //       onClick={handleClickShowPassword}
+          //       onMouseDown={handleMouseDownPassword}
+          //     >
+          //       {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
+          //     </IconButton>
+          //   </InputAdornment>
+          // }
           />
         <Button 
           variant="contained" 
