@@ -17,6 +17,7 @@
   },
   "sign_up": {
     "createAccount": "Create an account",
+    "succesAccountCreation": "Your account has been succesfully created!",
     "shopName": {
       "placeholder": "Shop name",
       "errorMessage": "The shop name field can not be empty"
@@ -36,6 +37,7 @@
       "placeholder": "Email",
       "errors": {
         "empty": "The email field can not be empty",
+        "formatError": "The email format is not correct",
         "used": "This email is already used"
       }
     },

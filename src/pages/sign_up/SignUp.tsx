@@ -1,12 +1,17 @@
-import { Button, Grid, Input, styled, TextField } from '@mui/material'
+import { Alert, Button, Grid, Input, styled, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { SIGN_UP } from '../../mutations';
 import { useNavigate } from 'react-router-dom';
 import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../queries';
 import { useTranslation } from 'react-i18next';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Snackbar from '@mui/material/Snackbar';
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
+
 
 const useStyles = makeStyles({
   root: {
@@ -87,14 +92,15 @@ const SignUp = () => {
     phone: '',
     password: ''
   });
+  const [successOpen, setSuccessOpen] = useState(false);
 
-  const { loading: emailLoading, error: emailError, data: emailData } = 
-    useQuery(IS_VENDOR_EMAIL_USED, {
+  const [isEmailUnique, { loading: emailLoading, error: emailError, data: emailData }] = 
+    useLazyQuery(IS_VENDOR_EMAIL_USED, {
       variables: { email: accountInput.email }
     },);
 
-  const { loading: usernameLoading, error: usernameError, data: usernameData } = 
-    useQuery(IS_VENDOR_USERNAME_USED, {
+  const [isUsernameUnique, { loading: usernameLoading, error: usernameError, data: usernameData }] = 
+    useLazyQuery(IS_VENDOR_USERNAME_USED, {
       variables: { username: accountInput.username }
     },);
 
@@ -117,28 +123,45 @@ const SignUp = () => {
     setVerifyPassword(event.target.value)
   }
 
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSuccessOpen(false);
+  };
+
   const isValid = async () => {
     setErrorMessage(initialErrorState);
     console.log(usernameData)
     let isAllValid = true
     if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", t('sign_up.shopName.errorMessage')); isAllValid = false}
     if(accountInput.username.length === 0) {handleErrorChange("usernameError", t('sign_up.username.errors.empty')); isAllValid = false}
-    else if(usernameLoading) {
-      //TODO: HANDLE LOADING
-    } else if(usernameError) {
-      //TODO: HANDLE ERROR
-    } else if(usernameData.isVendorUsernameUsed) {
-      {handleErrorChange("usernameError", t('sign_up.username.errors.used')); isAllValid = false}
+    else {
+      await isUsernameUnique({variables: {username: accountInput.username}})
+      if(usernameLoading) {
+        //TODO: HANDLE LOADING
+      } else if(usernameError) {
+        //TODO: HANDLE ERROR
+      } else if(usernameData.isVendorUsernameUsed) {
+        {handleErrorChange("usernameError", t('sign_up.username.errors.used')); isAllValid = false}
+      }
     }
     if(accountInput.address.length === 0) {handleErrorChange("addressError", t('sign_up.address.errorMessage')); isAllValid = false}
     if(accountInput.phone.length === 0) {handleErrorChange("phoneError", t('sign_up.phone.errorMessage')); isAllValid = false}
     if(accountInput.email.length === 0) {handleErrorChange("emailError", t('sign_up.email.errors.empty')); isAllValid = false}
-    else if(emailLoading) {
-      //TODO: HANDLE LOADING
-    } else if(emailError) {
-      //TODO: HANDLE ERROR
-    } else if(emailData.isVendorEmailUsed) {
-      {handleErrorChange("emailError", t('sign_up.email.errors.used')); isAllValid = false}
+    else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(accountInput.email)){
+      handleErrorChange("emailError", t('sign_up.email.errors.formatError'));
+      isAllValid = false
+    }
+    else {
+      await isEmailUnique({variables: {email: accountInput.email}})
+      if(emailLoading) {
+        //TODO: HANDLE LOADING
+      } else if(emailError) {
+        //TODO: HANDLE ERROR
+      } else if(emailData.isVendorEmailUsed) {
+        {handleErrorChange("emailError", t('sign_up.email.errors.used')); isAllValid = false}
+      }
     }
     if(accountInput.password.length === 0) {handleErrorChange("passwordError", t('sign_up.password.errorMessage')); isAllValid = false}
     if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", t('sign_up.confirmPassword.errorMessage')); isAllValid = false}
@@ -154,11 +177,12 @@ const SignUp = () => {
       } else if(error){
         //TODO: HANDLE WRONG EMAIL OR PASSWORD
         console.log(error)
-      } else if(data != null){
+      } else if(data.vendorSignUp._id != null){
+        console.log("SUCCÈS")
+        setSuccessOpen(true)
         navigate("/login")
       }
     }
-    
   }
 
   return(
@@ -185,7 +209,7 @@ const SignUp = () => {
           <TextField 
             variant='standard'
             className={classes.input} 
-            color="warning" 
+            color="warning"
             placeholder={t('sign_up.username.placeholder')}
             value={accountInput.username} 
             onChange={handleChange('username', 'usernameError')}
@@ -224,6 +248,14 @@ const SignUp = () => {
             error = {errorMessage.phoneError.length > 0}
             helperText = {errorMessage.phoneError}
           />
+          {/* <PhoneInput
+            className={classes.input}
+            defaultCountry='CA'
+            placeholder={t('sign_up.phone.placeholder')}
+            value={accountInput.phone}
+            onChange={(phoneNumber) => handleChange('phone', 'phoneError')}
+            helperText = "TEST"
+            /> */}
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
           <TextField 
@@ -249,12 +281,33 @@ const SignUp = () => {
             helperText = {errorMessage.verifyPasswordError}
             />
         </Grid>
-        <Button 
-          variant="contained"
-          style={{ background: '#ffa500', margin: '15px'}}
-          onClick={handleCreateAccount}>
+        {loading ? (
+          <LoadingButton
+            size="small"
+            loading={loading}
+            variant="contained"
+            style={{ background: '#ffa500', margin: '15px'}}
+          >
             {t('sign_up.createAccount')}
-        </Button>
+          </LoadingButton>
+          ) : (
+          <Button 
+            variant="contained"
+            style={{ background: '#ffa500', margin: '15px'}}
+            onClick={handleCreateAccount}>
+                {t('sign_up.createAccount')}
+            </Button>
+          )
+        }
+        <Snackbar 
+          // anchorOrigin={ vertical: 'bottom', horizontal: 'right' } 
+          open={successOpen}
+          autoHideDuration={6000}
+          onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+          {t('sign_up.succesAccountCreation')}
+        </Alert>
+      </Snackbar>
       </Grid>
     </Grid>
   )

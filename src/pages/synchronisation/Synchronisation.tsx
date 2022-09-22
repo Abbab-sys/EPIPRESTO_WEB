@@ -7,6 +7,7 @@ import { useMutation } from '@apollo/client';
 import { SYNCH_SHOPIFY } from '../../mutations';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useTranslation } from 'react-i18next';
+import { VendorContext } from '../../context/Vendor';
 
 const useStyles = makeStyles({
   root: {
@@ -60,6 +61,7 @@ interface WoocommerceInput {
 const Synchronisation = () => {
   const { t } = useTranslation('translation')
   const classes = useStyles();
+  const state = useContext(VendorContext)
   const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY)
   const [shopifyCreds, setShopifyCreds] = useState<ShopifyInput>({
     apiToken: '',
@@ -102,7 +104,7 @@ const Synchronisation = () => {
     }
   }
 
-  console.log(shopifyCreds)
+  console.log(state.storeId)
 
   return(
     <Grid

@@ -1,5 +1,4 @@
-import { VisibilityOff, Visibility } from '@mui/icons-material';
-import { Button, Grid, IconButton, Input, InputAdornment, Link, TextField } from '@mui/material'
+import { Button, Grid, Link, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +7,7 @@ import { useQuery } from '@apollo/client/react';
 import { LOGIN } from '../../queries';
 import { VendorContext } from '../../context/Vendor';
 import { useTranslation } from 'react-i18next';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles({
   root: {
@@ -108,17 +108,16 @@ const Login = () => {
   }
 
   const handleLogin = () => {
-    console.log(data)
     if(isValid()){
+      // await login({variables: {email: credentials.email, password: credentials.password}})
       if(loading) {
         //TODO: HANDLE LOADING
       } else if(error){
         //TODO: HANDLE WRONG EMAIL OR PASSWORD
         console.log(error)
-      } else if(data.loginVendor != null){
+      } else {
         state.setStoreId(data.loginVendor.store._id)
-        console.log(data.loginVendor.store._id)
-        navigate("/synchronisation")
+        navigate("/synchronization")
       }
     }
   }
@@ -154,25 +153,13 @@ const Login = () => {
           onChange={handleChange('password')}
           error = {errorMessage.passwordError.length > 0}
           helperText = {errorMessage.passwordError}
-          // endAdornment={
-          //   <InputAdornment position="end">
-          //     <IconButton
-          //       onClick={handleClickShowPassword}
-          //       onMouseDown={handleMouseDownPassword}
-          //     >
-          //       {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
-          //     </IconButton>
-          //   </InputAdornment>
-          // }
-          // lol
-          //ewjoifjewiojfoiewjfdiewj
           />
-        <Button 
-          variant="contained" 
-          style={{ background: '#ffa500', margin: '15px'}}
-          onClick={handleLogin}>
-            {t('login.login')}
-        </Button>
+          <Button 
+            variant="contained" 
+            style={{ background: '#ffa500', margin: '15px'}}
+            onClick={handleLogin}>
+              {t('login.login')}
+          </Button>  
         {/* <Typography className={classes.input} display="inline-block">
           New to Épipresto? */}
           <Link style={{ margin: '15px'}} className={classes.link} onClick={handleCreateAccount}>

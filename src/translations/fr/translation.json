@@ -17,6 +17,7 @@
   },
   "sign_up": {
     "createAccount": "Créer un compte",
+    "succesAccountCreation": "Votre compte a été créé aves succès!",
     "shopName": {
       "placeholder": "Nom du marché",
       "errorMessage": "Le champ du nom du marché ne peut pas être vide"
@@ -36,6 +37,7 @@
       "placeholder": "Email",
       "errors": {
         "empty": "Le champ d'email ne peut pas être vide",
+        "formatError": "Le format de l'email est incorrect",
         "used": "Cet email est déjà utilisé"
       }
     },

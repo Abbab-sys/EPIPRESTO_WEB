@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/login/Login';
 import Synchronisation from './pages/synchronisation/Synchronisation';
 import SignUp from './pages/sign_up/SignUp';
@@ -80,9 +80,10 @@ function App() {
         </Box>
           <Router>
             <Routes>
+              <Route path="*" element={<Navigate replace to="/login"/>}></Route>
               <Route element={<Login />} path="/login"></Route>
               <Route element={<SignUp />} path="/sign-up"></Route>
-              <Route element={<Synchronisation />} path="/synchronisation"></Route>
+              <Route element={<Synchronisation />} path="/synchronization"></Route>
             </Routes>
           </Router>
         </div>
