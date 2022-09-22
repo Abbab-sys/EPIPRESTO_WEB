@@ -1,0 +1,66 @@
+{
+  "language": {
+    "en": "English",
+    "fr": "French",
+    "language": "Language"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "login": "LOG IN",
+    "createAccount": "Create an account",
+    "errorMessages": {
+      "emailError": "The email field can not be empty",
+      "passwordError": "The password can not be empty",
+      "credentialsError": "The email or the password is incorrect"
+    }
+  },
+  "sign_up": {
+    "createAccount": "Create an account",
+    "shopName": {
+      "placeholder": "Shop name",
+      "errorMessage": "The shop name field can not be empty"
+    },
+    "username": {
+      "placeholder": "Username",
+      "errors": {
+        "empty": "The username field can not be empty",
+        "used": "This username is already used"
+      }
+    },
+    "address": {
+      "placeholder": "Address",
+      "errorMessage": "The address field can not be empty"
+    },
+    "email": {
+      "placeholder": "Email",
+      "errors": {
+        "empty": "The email field can not be empty",
+        "used": "This email is already used"
+      }
+    },
+    "phone": {
+      "placeholder": "Phone number",
+      "errorMessage": "The phone number field can not be empty"
+    },
+    "password": {
+      "placeholder": "Password",
+      "errorMessage": "The password field can not be empty"
+    },
+    "confirmPassword": {
+      "placeholder": "Confirm password",
+      "errorMessage": "The two passwords do not match"
+    }
+  },
+  "synchronization": {
+    "domainName": "Domain name",
+    "synchronize": "SYNCHRONIZE",
+    "shopify": {
+      "apiToken": "API Token"
+    },
+    "woocommerce": {
+      "consumerKey": "Shop consumer key",
+      "consumerSecret": "Shop consumer secret"
+    }
+  }
+}

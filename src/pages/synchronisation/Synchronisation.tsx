@@ -5,7 +5,8 @@ import woocommerce_logo from '../../assets/woocommerce_logo.png';
 import React, { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
 import { SYNCH_SHOPIFY } from '../../mutations';
-import { VendorContext } from '../../context/Vendor';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   root: {
@@ -30,7 +31,14 @@ const useStyles = makeStyles({
   input: {
     margin: '15px',
     width: "87%"
-  }
+  },
+  innerForm: {
+    display: 'flex',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "90%",
+    maxWidth: "-webkit-fill-available"
+  },
 })
 
 enum ApiType {
@@ -38,20 +46,30 @@ enum ApiType {
   WOOCOMMERCE="WOOCOMMERCE"
 }
 
-interface SynchronizeInput {
+interface ShopifyInput {
   apiToken: string,
   shopDomain: string
 }
 
-const Synchronisation = () => {
+interface WoocommerceInput {
+  shopDomain: string,
+  shopConsumerKey: string,
+  shopConsumerSecret: string
+}
 
+const Synchronisation = () => {
+  const { t } = useTranslation('translation')
   const classes = useStyles();
-  const { storeId, setStoreId } = useContext(VendorContext)
   const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY)
-  const [shopifyCreds, setShopifyCreds] = useState<SynchronizeInput>({
+  const [shopifyCreds, setShopifyCreds] = useState<ShopifyInput>({
     apiToken: '',
     shopDomain: ''
   });
+  const [woocommerceCreds, setWoocommerceCreds] = useState<WoocommerceInput>({
+    shopDomain: '',
+    shopConsumerKey: '',
+    shopConsumerSecret: ''
+  })
   const [synchronize, { loading, error, data }] = useMutation(SYNCH_SHOPIFY);
 
   const handleApi = () => (
@@ -64,8 +82,12 @@ const Synchronisation = () => {
     }
   };
 
-  const handleChange = (prop: keyof SynchronizeInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleShopifyChange = (prop: keyof ShopifyInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setShopifyCreds({ ...shopifyCreds, [prop]: event.target.value });
+  };
+
+  const handleWoocommerceChange = (prop: keyof WoocommerceInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setWoocommerceCreds({ ...woocommerceCreds, [prop]: event.target.value });
   };
 
   const handleSynchronisation = () => {
@@ -89,7 +111,8 @@ const Synchronisation = () => {
       spacing={0}
       direction="column"
       className={classes.root}>
-      <Grid item xs={3} className={classes.form} direction="column">
+      {/* {loading && (<CircularProgress />)} */}
+      <Grid item xs={5} className={classes.form} direction="column">
         <ToggleButtonGroup 
           value={apiType}
           exclusive
@@ -103,27 +126,54 @@ const Synchronisation = () => {
             <img src={woocommerce_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
           </ToggleButtonGroup>
-          <Input
-            color="warning"
-            placeholder="API Token"
-            value={shopifyCreds.apiToken}
-            onChange={handleChange('apiToken')}
-            className={classes.input}
-          ></Input>
-          {apiType === ApiType.SHOPIFY &&(
-            <Input
-              color="warning"
-              placeholder="Domain name"
-              value={shopifyCreds.shopDomain}
-              onChange={handleChange('shopDomain')}
-              className={classes.input}
-              ></Input>
+          {apiType === ApiType.SHOPIFY && (
+            <Grid item className={classes.innerForm} direction="column">
+              <Input
+                color="warning"
+                placeholder={t('synchronization.shopify.apiToken')}
+                value={shopifyCreds.apiToken}
+                onChange={handleShopifyChange('apiToken')}
+                className={classes.input}
+                ></Input>
+              <Input
+                color="warning"
+                placeholder={t('synchronization.domainName')}
+                value={shopifyCreds.shopDomain}
+                onChange={handleShopifyChange('shopDomain')}
+                className={classes.input}
+                ></Input>
+              </Grid>
+          )}
+          {apiType === ApiType.WOOCOMMERCE && (
+            <Grid item className={classes.innerForm} direction="column">
+              <Input
+                color="warning"
+                placeholder={t('synchronization.domainName')}
+                value={woocommerceCreds.shopDomain}
+                onChange={handleWoocommerceChange('shopDomain')}
+                className={classes.input}
+                ></Input>
+              <Input
+                color="warning"
+                placeholder={t('synchronization.woocommerce.consumerKey')}
+                value={woocommerceCreds.shopConsumerKey}
+                onChange={handleWoocommerceChange('shopConsumerKey')}
+                className={classes.input}
+                ></Input>
+                <Input
+                color="warning"
+                placeholder={t('synchronization.woocommerce.consumerSecret')}
+                value={woocommerceCreds.shopConsumerSecret}
+                onChange={handleWoocommerceChange('shopConsumerSecret')}
+                className={classes.input}
+                ></Input>
+            </Grid>
           )}
           <Button
             variant="contained" 
             style={{ background: '#ffa500', margin: '15px'}}
             onClick={handleSynchronisation}>
-            SYNCHRONISE
+            {t('synchronization.synchronize')}
           </Button>
       </Grid>
     </Grid>

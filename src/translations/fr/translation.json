@@ -1,0 +1,66 @@
+{
+  "language": {
+    "en": "Anglais",
+    "fr": "Français",
+    "language": "Langue"
+  },
+  "login":{
+    "email": "Email",
+    "password": "Mot de passe",
+    "login": "SE CONNECTER",
+    "createAccount": "Créer un compte",
+    "errorMessages": {
+      "emailError": "L'email ne peut pas être vide",
+      "passwordError": "Le mot de passe ne peut pas être vide",
+      "credentialsError": "L'email ou le mot de passe renseigné est incorrect"
+    }
+  },
+  "sign_up": {
+    "createAccount": "Créer un compte",
+    "shopName": {
+      "placeholder": "Nom du marché",
+      "errorMessage": "Le champ du nom du marché ne peut pas être vide"
+    },
+    "username": {
+      "placeholder": "Pseudonyme",
+      "errors": {
+        "empty": "Le champ du pseudonyme ne peut pas être vide",
+        "used": "Ce pseudonyme est déjà utilisé"
+      } 
+    },
+    "address": {
+      "placeholder": "Adresse",
+      "errorMessage": "Le champ d'adresse ne peut pas être vide"
+    },
+    "email": {
+      "placeholder": "Email",
+      "errors": {
+        "empty": "Le champ d'email ne peut pas être vide",
+        "used": "Cet email est déjà utilisé"
+      }
+    },
+    "phone": {
+      "placeholder": "Numéro de téléphone",
+      "errorMessage": "Le champ du numéro de téléphone ne peut pas être vide"
+    },
+    "password": {
+      "placeholder": "Mot de passe",
+      "errorMessage": "Le champ du mot de passe ne peut pas être vide"
+    },
+    "confirmPassword": {
+      "placeholder": "Confirmez votre mot de passe",
+      "errorMessage": "Les deux mots de passe ne sont pas identiques"
+    }
+  },
+  "synchronization": {
+    "domainName": "Nom de domaine",
+    "synchronize": "SYNCHRONISER",
+    "shopify": {
+      "apiToken": "API Token"
+    },
+    "woocommerce": {
+      "consumerKey": "Clé de consommateur du marché",
+      "consumerSecret": "Secret du consommateur"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { SIGN_UP } from '../../mutations';
 import { useNavigate } from 'react-router-dom';
 import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../queries';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   root: {
@@ -74,7 +75,7 @@ const initialErrorState: ErrorMessage = {
 }
 
 const SignUp = () => {
-
+  const { t } = useTranslation('translation')
   const classes = useStyles()
   const navigate = useNavigate()
   const [verifyPassword, setVerifyPassword] = useState<string>('')
@@ -120,27 +121,27 @@ const SignUp = () => {
     setErrorMessage(initialErrorState);
     console.log(usernameData)
     let isAllValid = true
-    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", "Veuillez saisir le nom de votre magasin"); isAllValid = false}
-    if(accountInput.username.length === 0) {handleErrorChange("usernameError", "Veuillez saisir un pseudonyme"); isAllValid = false}
+    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", t('sign_up.shopName.errorMessage')); isAllValid = false}
+    if(accountInput.username.length === 0) {handleErrorChange("usernameError", t('sign_up.username.errors.empty')); isAllValid = false}
     else if(usernameLoading) {
       //TODO: HANDLE LOADING
     } else if(usernameError) {
       //TODO: HANDLE ERROR
     } else if(usernameData.isVendorUsernameUsed) {
-      {handleErrorChange("usernameError", "Ce pseudonyme est déjà utilisé"); isAllValid = false}
+      {handleErrorChange("usernameError", t('sign_up.username.errors.used')); isAllValid = false}
     }
-    if(accountInput.address.length === 0) {handleErrorChange("addressError", "Veuillez saisir l'adresse de votre magasin"); isAllValid = false}
-    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", "Veuillez saisir votre numéro de téléphone"); isAllValid = false}
-    if(accountInput.email.length === 0) {handleErrorChange("emailError", "Veuillez saisir votre email"); isAllValid = false}
+    if(accountInput.address.length === 0) {handleErrorChange("addressError", t('sign_up.address.errorMessage')); isAllValid = false}
+    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", t('sign_up.phone.errorMessage')); isAllValid = false}
+    if(accountInput.email.length === 0) {handleErrorChange("emailError", t('sign_up.email.errors.empty')); isAllValid = false}
     else if(emailLoading) {
       //TODO: HANDLE LOADING
     } else if(emailError) {
       //TODO: HANDLE ERROR
     } else if(emailData.isVendorEmailUsed) {
-      {handleErrorChange("emailError", "Cet email est déjà utilisé"); isAllValid = false}
+      {handleErrorChange("emailError", t('sign_up.email.errors.used')); isAllValid = false}
     }
-    if(accountInput.password.length === 0) {handleErrorChange("passwordError", "Veuillez saisir un mot de passe"); isAllValid = false}
-    if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", "Le mot de passe de confirmation n'a pas le même mot de passe"); isAllValid = false}
+    if(accountInput.password.length === 0) {handleErrorChange("passwordError", t('sign_up.password.errorMessage')); isAllValid = false}
+    if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", t('sign_up.confirmPassword.errorMessage')); isAllValid = false}
     return isAllValid
   }
   
@@ -157,6 +158,7 @@ const SignUp = () => {
         navigate("/login")
       }
     }
+    
   }
 
   return(
@@ -173,7 +175,7 @@ const SignUp = () => {
           color="warning"
           style={{ width: "80%", maxWidth: "-webkit-fill-available" }} 
           className={classes.input} 
-          placeholder="Shop name" 
+          placeholder={t('sign_up.shopName.placeholder')}
           value={accountInput.shopName} 
           onChange={handleChange('shopName', 'shopNameError')}
           error = {errorMessage.shopNameError.length > 0}
@@ -184,7 +186,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input} 
             color="warning" 
-            placeholder="Username" 
+            placeholder={t('sign_up.username.placeholder')}
             value={accountInput.username} 
             onChange={handleChange('username', 'usernameError')}
             error = {errorMessage.usernameError.length > 0}
@@ -194,7 +196,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input}
             color="warning"
-            placeholder="Address"
+            placeholder={t('sign_up.address.placeholder')}
             value={accountInput.address}
             onChange={handleChange('address', 'addressError')}
             error = {errorMessage.addressError.length > 0}
@@ -206,7 +208,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input}
             color="warning"
-            placeholder="Email"
+            placeholder={t('sign_up.email.placeholder')}
             value={accountInput.email}
             onChange={handleChange('email', 'emailError')}
             error = {errorMessage.emailError.length > 0}
@@ -216,7 +218,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input}
             color="warning"
-            placeholder="Phone"
+            placeholder={t('sign_up.phone.placeholder')}
             value={accountInput.phone}
             onChange={handleChange('phone', 'phoneError')}
             error = {errorMessage.phoneError.length > 0}
@@ -228,7 +230,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input}
             color="warning"
-            placeholder="Password"
+            placeholder={t('sign_up.password.placeholder')}
             type={'password'}
             value={accountInput.password}
             onChange={handleChange('password', 'passwordError')}
@@ -241,7 +243,7 @@ const SignUp = () => {
             color="warning"
             type={'password'}
             value={verifyPassword}
-            placeholder="Confirm Password"
+            placeholder={t('sign_up.confirmPassword.placeholder')}
             onChange={handleVerifyPasswordChange()}
             error = {errorMessage.verifyPasswordError.length > 0}
             helperText = {errorMessage.verifyPasswordError}
@@ -251,7 +253,7 @@ const SignUp = () => {
           variant="contained"
           style={{ background: '#ffa500', margin: '15px'}}
           onClick={handleCreateAccount}>
-            Create account
+            {t('sign_up.createAccount')}
         </Button>
       </Grid>
     </Grid>

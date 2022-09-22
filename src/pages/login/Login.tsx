@@ -7,6 +7,7 @@ import logo from '../../assets/logo.png';
 import { useQuery } from '@apollo/client/react';
 import { LOGIN } from '../../queries';
 import { VendorContext } from '../../context/Vendor';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   root: {
@@ -15,6 +16,7 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     minHeight: '100vh',
+    padding: '10px'
   },
   form: {
     display: 'flex',
@@ -25,7 +27,7 @@ const useStyles = makeStyles({
     background: 'white',
   },
   input: {
-    margin: '15px',
+    margin: '15px !important',
     width: "85%"
   },
   link: {
@@ -56,7 +58,7 @@ const initialErrorState: ErrorMessage = {
 }
 
 const Login = () => {
-
+  const { t } = useTranslation('translation')
   const classes = useStyles()
   const navigate = useNavigate()
   const state = useContext(VendorContext)
@@ -100,8 +102,8 @@ const Login = () => {
   const isValid = () => {
     setErrorMessage(initialErrorState);
     let isAllValid = true
-    if(credentials.email.length === 0) {handleErrorChange("emailError", "Veuillez remplir votre email"); isAllValid = false}
-    if(credentials.password.length === 0) {handleErrorChange("passwordError", "Veuillez remplir votre mot de passe"); isAllValid = false}
+    if(credentials.email.length === 0) {handleErrorChange("emailError", t('login.errorMessages.emailError')); isAllValid = false}
+    if(credentials.password.length === 0) {handleErrorChange("passwordError", t('login.errorMessages.passwordError')); isAllValid = false}
     return isAllValid
   }
 
@@ -124,17 +126,17 @@ const Login = () => {
   return(
     <Grid 
       container
-      xs={12} 
+      xs={12}
       spacing={0}
       direction="column"
       className={classes.root}>
-      <Grid item xs={3} className={classes.form} direction="column">
+      <Grid container xs={5} className={classes.form} direction="column">
         <img src={logo} height={"80px"} width={"200px"}></img>
         <TextField
           variant='standard'
           className={classes.input}
           color="warning"
-          placeholder="Email"
+          placeholder={t('login.email')}
           value={credentials.email}
           onChange={handleChange('email')}
           error = {errorMessage.emailError.length > 0}
@@ -144,7 +146,7 @@ const Login = () => {
           variant='standard'
           className={classes.input}
           color="warning"
-          placeholder="Password"
+          placeholder={t('login.password')}
           type={
             credentials.showPassword ? 'text' : 
             'password'}
@@ -169,12 +171,12 @@ const Login = () => {
           variant="contained" 
           style={{ background: '#ffa500', margin: '15px'}}
           onClick={handleLogin}>
-            LOG IN
+            {t('login.login')}
         </Button>
         {/* <Typography className={classes.input} display="inline-block">
           New to Épipresto? */}
           <Link style={{ margin: '15px'}} className={classes.link} onClick={handleCreateAccount}>
-            {'Create an account'}
+            {t('login.createAccount')}
           </Link>
         {/* </Typography> */}
       </Grid>

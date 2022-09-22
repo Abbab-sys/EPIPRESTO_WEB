@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Login from './pages/login/Login';
@@ -8,18 +8,33 @@ import { makeStyles } from '@mui/styles';
 import { VendorContext } from './context/Vendor';
 import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { useTranslation } from 'react-i18next';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Box, FormControl, InputLabel, MenuItem } from '@mui/material';
 
 const useStyles = makeStyles({
   root: {
     background: "linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25))",
     minHeight: '100vh',
   },
+  languageChange: {
+    position: "fixed",
+    top: 10,
+    right: 15
+  },
+  select: {
+    '&.MuiNativeSelect-nativeInput':{
+      borderBottom: '2px solid #ffa500 !important'
+    }
+  }
 })
 
 function App() {
+  const { t, i18n } = useTranslation('translation')
   const classes = useStyles()
   const state = useContext(VendorContext)
   const [storeId, setStoreId] = useState<string>("");
+  const [language, setLanguage] = useState(i18n.language);
   const value = { storeId, setStoreId };
   useEffect(() => {console.log("UPDATE" + state.storeId)}, [state.storeId])
   const httpLink = createHttpLink({
@@ -38,6 +53,11 @@ function App() {
     link: authLink.concat(httpLink),
     cache: new InMemoryCache()
   });
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setLanguage(event.target.value as string);
+    i18n.changeLanguage(event.target.value)
+  };
   
   console.log(state)
 
@@ -45,6 +65,19 @@ function App() {
     <VendorContext.Provider value={value}>
       <ApolloProvider client={client}>
         <div className={classes.root}>
+        <Box sx={{ minWidth: 120 }} className={classes.languageChange}>
+          <FormControl fullWidth variant="filled" sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel>{t('language.language')}</InputLabel>
+            <Select
+              value={language}
+              onChange={handleChange}
+              className={classes.select}
+            >
+              <MenuItem value={'en'}>{t('language.en')}</MenuItem>
+              <MenuItem value={'fr'}>{t('language.fr')}</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
           <Router>
             <Routes>
               <Route element={<Login />} path="/login"></Route>
