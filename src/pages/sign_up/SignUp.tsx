@@ -9,8 +9,8 @@ import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../queries';
 import { useTranslation } from 'react-i18next';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Snackbar from '@mui/material/Snackbar';
-import PhoneInput from 'react-phone-number-input'
-import 'react-phone-number-input/style.css'
+//import PhoneInput from 'react-phone-number-input'
+//import 'react-phone-number-input/style.css'
 
 
 const useStyles = makeStyles({
@@ -94,15 +94,11 @@ const SignUp = () => {
   });
   const [successOpen, setSuccessOpen] = useState(false);
 
-  const [isEmailUnique, { loading: emailLoading, error: emailError, data: emailData }] = 
-    useLazyQuery(IS_VENDOR_EMAIL_USED, {
-      variables: { email: accountInput.email }
-    },);
+  const [isEmailUnique] =
+    useLazyQuery(IS_VENDOR_EMAIL_USED);
 
-  const [isUsernameUnique, { loading: usernameLoading, error: usernameError, data: usernameData }] = 
-    useLazyQuery(IS_VENDOR_USERNAME_USED, {
-      variables: { username: accountInput.username }
-    },);
+  const [isUsernameUnique] =
+    useLazyQuery(IS_VENDOR_USERNAME_USED);
 
   const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
 
@@ -132,17 +128,16 @@ const SignUp = () => {
 
   const isValid = async () => {
     setErrorMessage(initialErrorState);
-    console.log(usernameData)
     let isAllValid = true
     if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", t('sign_up.shopName.errorMessage')); isAllValid = false}
     if(accountInput.username.length === 0) {handleErrorChange("usernameError", t('sign_up.username.errors.empty')); isAllValid = false}
     else {
-      await isUsernameUnique({variables: {username: accountInput.username}})
-      if(usernameLoading) {
+     const response= await isUsernameUnique({variables: {username: accountInput.username}})
+      if(response.loading) {
         //TODO: HANDLE LOADING
-      } else if(usernameError) {
+      } else if(response.error) {
         //TODO: HANDLE ERROR
-      } else if(usernameData.isVendorUsernameUsed) {
+      } else if(response.data.isVendorUsernameUsed) {
         {handleErrorChange("usernameError", t('sign_up.username.errors.used')); isAllValid = false}
       }
     }
@@ -154,12 +149,12 @@ const SignUp = () => {
       isAllValid = false
     }
     else {
-      await isEmailUnique({variables: {email: accountInput.email}})
-      if(emailLoading) {
+      const response= await isEmailUnique({variables: {email: accountInput.email}})
+      if(response.loading) {
         //TODO: HANDLE LOADING
-      } else if(emailError) {
+      } else if(response.error) {
         //TODO: HANDLE ERROR
-      } else if(emailData.isVendorEmailUsed) {
+      } else if(response.data.isVendorEmailUsed) {
         {handleErrorChange("emailError", t('sign_up.email.errors.used')); isAllValid = false}
       }
     }
@@ -167,28 +162,26 @@ const SignUp = () => {
     if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", t('sign_up.confirmPassword.errorMessage')); isAllValid = false}
     return isAllValid
   }
-  
+
   const handleCreateAccount = async () => {
-    if(await isValid()){
-      await signUp({ variables: { accountInput: accountInput } })
-      console.log(data)
-      if(loading) {
-        //TODO: HANDLE LOADING
-      } else if(error){
-        //TODO: HANDLE WRONG EMAIL OR PASSWORD
-        console.log(error)
-      } else if(data.vendorSignUp._id != null){
+    const is_valid = await isValid()
+    if(is_valid){
+      const response=await signUp({ variables: { accountInput: accountInput } })
+      console.log(response)
+      if(response.data.vendorSignUp._id != null){
         console.log("SUCCÈS")
         setSuccessOpen(true)
         navigate("/login")
+      }else{
+        console.log("ERROR")
       }
     }
   }
 
   return(
-    <Grid 
+    <Grid
       container
-      xs={12} 
+      xs={12}
       spacing={0}
       direction="column"
       className={classes.root}>
@@ -197,26 +190,26 @@ const SignUp = () => {
         <TextField
           variant='standard'
           color="warning"
-          style={{ width: "80%", maxWidth: "-webkit-fill-available" }} 
-          className={classes.input} 
+          style={{ width: "80%", maxWidth: "-webkit-fill-available" }}
+          className={classes.input}
           placeholder={t('sign_up.shopName.placeholder')}
-          value={accountInput.shopName} 
+          value={accountInput.shopName}
           onChange={handleChange('shopName', 'shopNameError')}
           error = {errorMessage.shopNameError.length > 0}
           helperText = {errorMessage.shopNameError}
         />
         <Grid item direction="row" className={classes.innerForm}>
-          <TextField 
+          <TextField
             variant='standard'
-            className={classes.input} 
+            className={classes.input}
             color="warning"
             placeholder={t('sign_up.username.placeholder')}
-            value={accountInput.username} 
+            value={accountInput.username}
             onChange={handleChange('username', 'usernameError')}
             error = {errorMessage.usernameError.length > 0}
             helperText = {errorMessage.usernameError}
           />
-          <TextField 
+          <TextField
             variant='standard'
             className={classes.input}
             color="warning"
@@ -258,7 +251,7 @@ const SignUp = () => {
             /> */}
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
-          <TextField 
+          <TextField
             variant='standard'
             className={classes.input}
             color="warning"
@@ -269,7 +262,7 @@ const SignUp = () => {
             error = {errorMessage.passwordError.length > 0}
             helperText = {errorMessage.passwordError}
             />
-          <TextField 
+          <TextField
             variant='standard'
             className={classes.input}
             color="warning"
@@ -281,17 +274,17 @@ const SignUp = () => {
             helperText = {errorMessage.verifyPasswordError}
             />
         </Grid>
-        {loading ? (
+        {false ? (
           <LoadingButton
             size="small"
-            loading={loading}
+            loading={false}
             variant="contained"
             style={{ background: '#ffa500', margin: '15px'}}
           >
             {t('sign_up.createAccount')}
           </LoadingButton>
           ) : (
-          <Button 
+          <Button
             variant="contained"
             style={{ background: '#ffa500', margin: '15px'}}
             onClick={handleCreateAccount}>
@@ -299,8 +292,8 @@ const SignUp = () => {
             </Button>
           )
         }
-        <Snackbar 
-          // anchorOrigin={ vertical: 'bottom', horizontal: 'right' } 
+        <Snackbar
+          // anchorOrigin={ vertical: 'bottom', horizontal: 'right' }
           open={successOpen}
           autoHideDuration={6000}
           onClose={handleClose}>

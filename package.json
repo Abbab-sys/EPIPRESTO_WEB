@@ -7,6 +7,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@mui/icons-material": "^5.10.3",
+    "@mui/lab": "^5.0.0-alpha.100",
     "@mui/material": "^5.10.5",
     "@mui/styles": "^5.10.3",
     "@testing-library/jest-dom": "^5.16.5",
@@ -16,6 +17,7 @@
     "@types/node": "^16.11.59",
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
+    "eslint": "8.22.0",
     "graphql": "^16.6.0",
     "i18next": "^21.9.2",
     "react": "^18.2.0",
@@ -51,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "eslint-config-react-app": "^7.0.1",
     "react-router-dom": "^6.4.0"
   }
 }
