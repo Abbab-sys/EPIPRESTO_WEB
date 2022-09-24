@@ -41,7 +41,6 @@ function App() {
     uri: 'http://localhost:4000/graphql',
   });
   const authLink = setContext((_, { headers }) => {
-    console.log("APP: " + storeId)
     return {
       headers: {
         ...headers,

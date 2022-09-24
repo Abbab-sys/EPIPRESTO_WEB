@@ -5,12 +5,13 @@
     "language": "Langue"
   },
   "login":{
-    "email": "Email",
+    "email": "Email ou Pseudonyme",
     "password": "Mot de passe",
     "login": "SE CONNECTER",
+    "newTo": "Nouveau chez Épipresto?",
     "createAccount": "Créer un compte",
     "errorMessages": {
-      "emailError": "L'email ne peut pas être vide",
+      "emailError": "L'email ou le pseudonyme ne peut pas être vide",
       "passwordError": "Le mot de passe ne peut pas être vide",
       "credentialsError": "L'email ou le mot de passe renseigné est incorrect"
     }
@@ -18,6 +19,7 @@
   "sign_up": {
     "createAccount": "Créer un compte",
     "succesAccountCreation": "Votre compte a été créé aves succès!",
+    "errorAccountCreation": "Oops une erreur est survenues",
     "shopName": {
       "placeholder": "Nom du marché",
       "errorMessage": "Le champ du nom du marché ne peut pas être vide"
@@ -55,11 +57,13 @@
     }
   },
   "synchronization": {
+    "synchronize": "SYNCHRONISER",
+    "success": "Votre marché a été synchronisé avec succès!",
+    "error": "Un des champs renseignés est incorrect",
     "domainName": {
       "placeholder": "Nom de domaine",
       "errorMessage" :"Le nom du domaine ne peut pas être vide"
     },
-    "synchronize": "SYNCHRONISER",
     "shopify": {
       "apiToken": {
         "placeholder": "API Token",
@@ -72,8 +76,8 @@
         "errorMessage": "La clé de consommateur ne peut pas être vide"
       },
       "consumerSecret": {
-        "placeholder": "Secret du consommateur",
-      "errorMessage": "Le secret du consommateur ne peut pas être vide"
+        "placeholder": "Clé secrète du consommateur",
+        "errorMessage": "La clé secrète du consommateur ne peut pas être vide"
       }
     }
   }

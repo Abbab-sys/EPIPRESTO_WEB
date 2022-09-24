@@ -1,14 +1,33 @@
 import { gql } from '@apollo/client'
 
-export const LOGIN = gql`
-  query LoginVendor($email: String!, $password: String!) {
-    loginVendor(email: $email, password: $password) {
-      _id
-      store {
+export const LOGIN_BY_EMAIL = gql`
+  query Query($email: String!, $password: String!) {
+    loginVendorByEmail(email: $email, password: $password) {
+      code
+      message
+      vendorAccount {
         _id
+        store {
+          _id
+        }
       }
     }
-}
+  }
+`
+
+export const LOGIN_BY_USERNAME = gql`
+  query Query($username: String!, $password: String!) {
+    loginVendorByUsername(username: $username, password: $password) {
+      code
+      message
+      vendorAccount {
+        _id
+        store {
+          _id
+        }
+      }
+    }
+  }
 `
 
 export const IS_VENDOR_USERNAME_USED = gql`

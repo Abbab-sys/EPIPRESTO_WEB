@@ -1,10 +1,10 @@
-import { Button, Grid, Input, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Alert, Button, Grid, Input, Snackbar, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
 import React, { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
-import { SYNCH_SHOPIFY } from '../../mutations';
+import { SYNCH_SHOPIFY, SYNCH_WOOCOMMERCE } from '../../mutations';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useTranslation } from 'react-i18next';
 import { VendorContext } from '../../context/Vendor';
@@ -30,7 +30,7 @@ const useStyles = makeStyles({
     }
   },
   input: {
-    margin: '15px',
+    margin: '15px !important',
     width: "87%"
   },
   innerForm: {
@@ -54,8 +54,8 @@ interface ShopifyInput {
 
 interface WoocommerceInput {
   shopDomain: string,
-  shopConsumerKey: string,
-  shopConsumerSecret: string
+  consumerKey: string,
+  consumerSecretKey: string
 }
 
 interface ErrorMessage {
@@ -80,22 +80,33 @@ const Synchronisation = () => {
   const state = useContext(VendorContext)
   const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY);
   const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [synchError, setSynchError] = useState(false);
   const [shopifyCreds, setShopifyCreds] = useState<ShopifyInput>({
     apiToken: '',
     shopDomain: ''
   });
   const [woocommerceCreds, setWoocommerceCreds] = useState<WoocommerceInput>({
     shopDomain: '',
-    shopConsumerKey: '',
-    shopConsumerSecret: ''
+    consumerKey: '',
+    consumerSecretKey: ''
   })
-  const [synchronize, { loading, error, data }] = useMutation(SYNCH_SHOPIFY);
+  const [synchronizeShopifyStore] = useMutation(SYNCH_SHOPIFY);
+
+  const [synchronizeWoocommerceStore] = useMutation(SYNCH_WOOCOMMERCE);
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const handleApi = () => (
     event: React.MouseEvent<HTMLElement>,
     api: ApiType,
   ) => {
-    console.log(api)
+    setErrorMessage(initialErrorState);
     if(api !== null){
       setApiType(api);
     }
@@ -107,12 +118,14 @@ const Synchronisation = () => {
     };
 
 
-  const handleShopifyChange = (prop: keyof ShopifyInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShopifyCreds({ ...shopifyCreds, [prop]: event.target.value });
+  const handleShopifyChange = (shopifyInputProp: keyof ShopifyInput, errorProp: keyof ErrorMessage) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [errorProp]: "" }));
+    setShopifyCreds({ ...shopifyCreds, [shopifyInputProp]: event.target.value });
   };
 
-  const handleWoocommerceChange = (prop: keyof WoocommerceInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setWoocommerceCreds({ ...woocommerceCreds, [prop]: event.target.value });
+  const handleWoocommerceChange = (wooInputProp: keyof WoocommerceInput, errorProp: keyof ErrorMessage) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [errorProp]: "" }));
+    setWoocommerceCreds({ ...woocommerceCreds, [wooInputProp]: event.target.value });
   };
 
   const isValid = () =>{
@@ -123,27 +136,33 @@ const Synchronisation = () => {
         if (shopifyCreds.shopDomain.length === 0) {handleErrorChange('shopDomainShopifyError', t('synchronization.domainName.errorMessage')); isAllValid = false}
       }else{
         if (woocommerceCreds.shopDomain.length === 0) {handleErrorChange('shopDomainWooError', t('synchronization.domainName.errorMessage')); isAllValid = false}
-        if (woocommerceCreds.shopConsumerKey.length === 0) {handleErrorChange('shopConsumerKeyError', t('synchronization.woocommerce.consumerKey.errorMessage')); isAllValid = false}
-        if (woocommerceCreds.shopConsumerSecret.length === 0) {handleErrorChange('shopConsumerSecretError', t('synchronization.shopify.consumerSecret.errorMessage')); isAllValid = false}
+        if (woocommerceCreds.consumerKey.length === 0) {handleErrorChange('shopConsumerKeyError', t('synchronization.woocommerce.consumerKey.errorMessage')); isAllValid = false}
+        if (woocommerceCreds.consumerSecretKey.length === 0) {handleErrorChange('shopConsumerSecretError', t('synchronization.woocommerce.consumerSecret.errorMessage')); isAllValid = false}
       }
       return isAllValid
   }
 
-  const handleSynchronisation = () => {
-    synchronize({ variables: { shopifyCreds : shopifyCreds } })
+  const handleSynchronisation = async () => {
     if(isValid()){
-      if(loading) {
-      //TODO: HANDLE LOADING
-    } else if(error){
-      //TODO: HANDLE WRONG EMAIL OR PASSWORD
-      console.log(error)
-    } else if(data != null){
-      console.log(data)
+      if(apiType === ApiType.SHOPIFY) {
+        const shopifySynchResponse = await synchronizeShopifyStore({ variables: { shopifyCreds : shopifyCreds } })
+        if(shopifySynchResponse.data.synchronizeShopifyStore.code === 200){
+          setSynchError(false)
+        } else {
+          setSynchError(true)
+        }
+        setSnackbarOpen(true)
+      } else {
+        const woocommerceSynchResponse = await synchronizeWoocommerceStore({ variables: { woocommerceCreds : woocommerceCreds } })
+        if(woocommerceSynchResponse.data.synchronizeWoocommerceStore.code === 200){
+          setSynchError(false)
+        } else {
+          setSynchError(true)
+        }
+        setSnackbarOpen(true)
+      }
     }
   }
-  }
-
-  console.log(state.storeId)
 
   return(
     <Grid
@@ -152,8 +171,7 @@ const Synchronisation = () => {
       spacing={0}
       direction="column"
       className={classes.root}>
-      {/* {loading && (<CircularProgress />)} */}
-      <Grid item xs={5} className={classes.form} direction="column">
+      <Grid container xs={3} className={classes.form} direction="column">
         <ToggleButtonGroup 
           value={apiType}
           exclusive
@@ -166,66 +184,78 @@ const Synchronisation = () => {
           <ToggleButton value={ApiType.WOOCOMMERCE} className={classes.api}>
             <img src={woocommerce_logo} height={"100px"} width={"100px"}/>
           </ToggleButton>
-          </ToggleButtonGroup>
-          {apiType === ApiType.SHOPIFY && (
-            <Grid item className={classes.innerForm} direction="column">
-              <TextField
-                color="warning"
-                placeholder={t('synchronization.shopify.apiToken.placeholder')}
-                value={shopifyCreds.apiToken}
-                onChange={handleShopifyChange('apiToken')}
-                className={classes.input}
-                error = {errorMessage.apiTokenError.length > 0}
-                helperText = {errorMessage.apiTokenError}
-                ></TextField>
-              <TextField
-                color="warning"
-                placeholder={t('synchronization.domainName.placeholder')}
-                value={shopifyCreds.shopDomain}
-                onChange={handleShopifyChange('shopDomain')}
-                className={classes.input}
-                error = {errorMessage.shopDomainShopifyError.length > 0}
-                helperText = {errorMessage.shopDomainShopifyError}
-                ></TextField>
-              </Grid>
-          )}
-          {apiType === ApiType.WOOCOMMERCE && (
-            <Grid item className={classes.innerForm} direction="column">
-              <TextField
-                color="warning"
-                placeholder={t('synchronization.domainName.placeholder')}
-                value={woocommerceCreds.shopDomain}
-                onChange={handleWoocommerceChange('shopDomain')}
-                className={classes.input}
-                error = {errorMessage.shopDomainWooError.length > 0}
-                helperText = {errorMessage.shopDomainWooError}
-                ></TextField>
-              <TextField
-                color="warning"
-                placeholder={t('synchronization.woocommerce.consumerKey.placeholder')}
-                value={woocommerceCreds.shopConsumerKey}
-                onChange={handleWoocommerceChange('shopConsumerKey')}
-                className={classes.input}
-                error = {errorMessage.shopConsumerKeyError.length > 0}
-                helperText = {errorMessage.shopConsumerKeyError}
-                ></TextField>
-                <TextField
-                color="warning"
-                placeholder={t('synchronization.woocommerce.consumerSecret.placeholder')}
-                value={woocommerceCreds.shopConsumerSecret}
-                onChange={handleWoocommerceChange('shopConsumerSecret')}
-                className={classes.input}
-                error = {errorMessage.shopConsumerSecretError.length > 0}
-                helperText = {errorMessage.shopConsumerSecretError}
-                ></TextField>
+        </ToggleButtonGroup>
+        {apiType === ApiType.SHOPIFY && (
+          <Grid container className={classes.innerForm} direction="column">
+            <TextField
+              color="warning"
+              placeholder={t('synchronization.shopify.apiToken.placeholder')}
+              value={shopifyCreds.apiToken}
+              onChange={handleShopifyChange('apiToken', 'apiTokenError')}
+              className={classes.input}
+              error = {errorMessage.apiTokenError.length > 0}
+              helperText = {errorMessage.apiTokenError}
+              ></TextField>
+            <TextField
+              color="warning"
+              placeholder={t('synchronization.domainName.placeholder')}
+              value={shopifyCreds.shopDomain}
+              onChange={handleShopifyChange('shopDomain', 'shopDomainShopifyError')}
+              className={classes.input}
+              error = {errorMessage.shopDomainShopifyError.length > 0}
+              helperText = {errorMessage.shopDomainShopifyError}
+              ></TextField>
             </Grid>
-          )}
-          <Button
-            variant="contained" 
-            style={{ background: '#ffa500', margin: '15px'}}
-            onClick={handleSynchronisation}>
-            {t('synchronization.synchronize')}
-          </Button>
+        )}
+        {apiType === ApiType.WOOCOMMERCE && (
+          <Grid container className={classes.innerForm} direction="column">
+            <TextField
+              color="warning"
+              placeholder={t('synchronization.domainName.placeholder')}
+              value={woocommerceCreds.shopDomain}
+              onChange={handleWoocommerceChange('shopDomain', 'shopDomainWooError')}
+              className={classes.input}
+              error = {errorMessage.shopDomainWooError.length > 0}
+              helperText = {errorMessage.shopDomainWooError}
+              ></TextField>
+            <TextField
+              color="warning"
+              placeholder={t('synchronization.woocommerce.consumerKey.placeholder')}
+              value={woocommerceCreds.consumerKey}
+              onChange={handleWoocommerceChange('consumerKey', 'shopConsumerKeyError')}
+              className={classes.input}
+              error = {errorMessage.shopConsumerKeyError.length > 0}
+              helperText = {errorMessage.shopConsumerKeyError}
+              ></TextField>
+              <TextField
+              color="warning"
+              placeholder={t('synchronization.woocommerce.consumerSecret.placeholder')}
+              value={woocommerceCreds.consumerSecretKey}
+              onChange={handleWoocommerceChange('consumerSecretKey', 'shopConsumerSecretError')}
+              className={classes.input}
+              error = {errorMessage.shopConsumerSecretError.length > 0}
+              helperText = {errorMessage.shopConsumerSecretError}
+              ></TextField>
+          </Grid>
+        )}
+        <Button
+          variant="contained" 
+          style={{ background: '#ffa500', margin: '15px'}}
+          onClick={handleSynchronisation}>
+          {t('synchronization.synchronize')}
+        </Button>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleClose}>
+          <Alert onClose={handleClose} severity={synchError ? "error" : "success"} sx={{ width: '100%' }}>
+            {synchError ? (
+              t('synchronization.error')
+            ) : (
+              t('synchronization.success')
+            )}
+          </Alert>
+        </Snackbar>
       </Grid>
     </Grid>
   )

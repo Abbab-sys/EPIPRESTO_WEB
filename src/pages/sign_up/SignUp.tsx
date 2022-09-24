@@ -35,15 +35,10 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     width: "90%",
-    maxWidth: "-webkit-fill-available"
   },
   input: {
     margin: '15px !important',
-    // '& .MuiOutlinedInput-root': {
-    //   '&:hover': {
-    //     color: '#ffa500',
-    //   },
-    // },
+    width: "100%"
   },
   button: {
     boxShadow: "0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12)"
@@ -92,13 +87,11 @@ const SignUp = () => {
     phone: '',
     password: ''
   });
-  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
 
-  const [isEmailUnique] =
-    useLazyQuery(IS_VENDOR_EMAIL_USED);
+  const [isEmailUnique] = useLazyQuery(IS_VENDOR_EMAIL_USED);
 
-  const [isUsernameUnique] =
-    useLazyQuery(IS_VENDOR_USERNAME_USED);
+  const [isUsernameUnique] = useLazyQuery(IS_VENDOR_USERNAME_USED);
 
   const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
 
@@ -123,7 +116,7 @@ const SignUp = () => {
     if (reason === 'clickaway') {
       return;
     }
-    setSuccessOpen(false);
+    setErrorOpen(false);
   };
 
   const isValid = async () => {
@@ -167,13 +160,10 @@ const SignUp = () => {
     const is_valid = await isValid()
     if(is_valid){
       const response=await signUp({ variables: { accountInput: accountInput } })
-      console.log(response)
-      if(response.data.vendorSignUp._id != null){
-        console.log("SUCCÈS")
-        setSuccessOpen(true)
+      if(response.data.vendorSignUp.code === 200){
         navigate("/login")
       }else{
-        console.log("ERROR")
+        setErrorOpen(true)
       }
     }
   }
@@ -185,19 +175,22 @@ const SignUp = () => {
       spacing={0}
       direction="column"
       className={classes.root}>
-      <Grid container xs={5} className={classes.form} direction="column">
-        <img src={logo} height={"80px"} width={"200px"}></img>
-        <TextField
-          variant='standard'
-          color="warning"
-          style={{ width: "80%", maxWidth: "-webkit-fill-available" }}
-          className={classes.input}
-          placeholder={t('sign_up.shopName.placeholder')}
-          value={accountInput.shopName}
-          onChange={handleChange('shopName', 'shopNameError')}
-          error = {errorMessage.shopNameError.length > 0}
-          helperText = {errorMessage.shopNameError}
-        />
+      <Grid container xs={4} className={classes.form} direction="column">
+        <Grid container className={classes.innerForm}>
+          <img src={logo} height={"80px"} width={"200px"}></img>
+        </Grid>
+        <Grid item direction="row" className={classes.innerForm}>
+          <TextField
+            variant='standard'
+            color="warning"
+            className={classes.input}
+            placeholder={t('sign_up.shopName.placeholder')}
+            value={accountInput.shopName}
+            onChange={handleChange('shopName', 'shopNameError')}
+            error = {errorMessage.shopNameError.length > 0}
+            helperText = {errorMessage.shopNameError}
+            />
+        </Grid>
         <Grid item direction="row" className={classes.innerForm}>
           <TextField
             variant='standard'
@@ -293,14 +286,13 @@ const SignUp = () => {
           )
         }
         <Snackbar
-          // anchorOrigin={ vertical: 'bottom', horizontal: 'right' }
-          open={successOpen}
+          open={errorOpen}
           autoHideDuration={6000}
           onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-          {t('sign_up.succesAccountCreation')}
-        </Alert>
-      </Snackbar>
+          <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+            {t('sign_up.errorAccountCreation')}
+          </Alert>
+        </Snackbar>
       </Grid>
     </Grid>
   )

@@ -5,12 +5,13 @@
     "language": "Language"
   },
   "login": {
-    "email": "Email",
+    "email": "Email or Username",
     "password": "Password",
     "login": "LOG IN",
+    "newTo": "New to Épipresto?",
     "createAccount": "Create an account",
     "errorMessages": {
-      "emailError": "The email field can not be empty",
+      "emailError": "The email or username field can not be empty",
       "passwordError": "The password can not be empty",
       "credentialsError": "The email or the password is incorrect"
     }
@@ -18,6 +19,7 @@
   "sign_up": {
     "createAccount": "Create an account",
     "succesAccountCreation": "Your account has been succesfully created!",
+    "errorAccountCreation": "Oops something went wrong",
     "shopName": {
       "placeholder": "Shop name",
       "errorMessage": "The shop name field can not be empty"
@@ -55,11 +57,13 @@
     }
   },
   "synchronization": {
+    "synchronize": "SYNCHRONIZE",
+    "success": "Your shop has been succesfully synchronized!",
+    "error": "One of the fields is incorrect",
     "domainName": {
       "placeholder": "Domain name",
       "errorMessage": "The shop domain name can not be empty"
     },
-    "synchronize": "SYNCHRONIZE",
     "shopify": {
       "apiToken": {
         "placeholder" : "API Token",
@@ -72,8 +76,8 @@
         "errorMessage": "The consumer key can not be empty"
       },
       "consumerSecret": {
-        "placeholder": "Shop consumer secret",
-        "errorMessage": "The consumer secret can not be empty"
+        "placeholder": "Shop consumer secret key",
+        "errorMessage": "The consumer secret key can not be empty"
       }
     }
   }
