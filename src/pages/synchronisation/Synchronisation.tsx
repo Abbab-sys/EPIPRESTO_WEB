@@ -1,4 +1,4 @@
-import { Button, Grid, Input, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Button, Grid, Input, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
@@ -58,11 +58,28 @@ interface WoocommerceInput {
   shopConsumerSecret: string
 }
 
+interface ErrorMessage {
+  apiTokenError: string;
+  shopDomainShopifyError: string;
+  shopDomainWooError: string;
+  shopConsumerKeyError: string;
+  shopConsumerSecretError: string;
+}
+
+const initialErrorState: ErrorMessage = {
+  apiTokenError: '',
+  shopDomainShopifyError: '',
+  shopDomainWooError: '',
+  shopConsumerKeyError: '',
+  shopConsumerSecretError: ''
+}
+
 const Synchronisation = () => {
   const { t } = useTranslation('translation')
   const classes = useStyles();
   const state = useContext(VendorContext)
-  const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY)
+  const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY);
+  const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
   const [shopifyCreds, setShopifyCreds] = useState<ShopifyInput>({
     apiToken: '',
     shopDomain: ''
@@ -84,6 +101,12 @@ const Synchronisation = () => {
     }
   };
 
+  const handleErrorChange =
+    (prop: keyof ErrorMessage, message: string) => {
+      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [prop]: message }));
+    };
+
+
   const handleShopifyChange = (prop: keyof ShopifyInput) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setShopifyCreds({ ...shopifyCreds, [prop]: event.target.value });
   };
@@ -92,9 +115,24 @@ const Synchronisation = () => {
     setWoocommerceCreds({ ...woocommerceCreds, [prop]: event.target.value });
   };
 
+  const isValid = () =>{
+      setErrorMessage(initialErrorState);
+      let isAllValid = true
+      if(apiType === ApiType.SHOPIFY){
+        if (shopifyCreds.apiToken.length === 0) {handleErrorChange('apiTokenError', t('synchronization.shopify.apiToken.errorMessage')); isAllValid = false}
+        if (shopifyCreds.shopDomain.length === 0) {handleErrorChange('shopDomainShopifyError', t('synchronization.domainName.errorMessage')); isAllValid = false}
+      }else{
+        if (woocommerceCreds.shopDomain.length === 0) {handleErrorChange('shopDomainWooError', t('synchronization.domainName.errorMessage')); isAllValid = false}
+        if (woocommerceCreds.shopConsumerKey.length === 0) {handleErrorChange('shopConsumerKeyError', t('synchronization.woocommerce.consumerKey.errorMessage')); isAllValid = false}
+        if (woocommerceCreds.shopConsumerSecret.length === 0) {handleErrorChange('shopConsumerSecretError', t('synchronization.shopify.consumerSecret.errorMessage')); isAllValid = false}
+      }
+      return isAllValid
+  }
+
   const handleSynchronisation = () => {
     synchronize({ variables: { shopifyCreds : shopifyCreds } })
-    if(loading) {
+    if(isValid()){
+      if(loading) {
       //TODO: HANDLE LOADING
     } else if(error){
       //TODO: HANDLE WRONG EMAIL OR PASSWORD
@@ -102,6 +140,7 @@ const Synchronisation = () => {
     } else if(data != null){
       console.log(data)
     }
+  }
   }
 
   console.log(state.storeId)
@@ -130,45 +169,55 @@ const Synchronisation = () => {
           </ToggleButtonGroup>
           {apiType === ApiType.SHOPIFY && (
             <Grid item className={classes.innerForm} direction="column">
-              <Input
+              <TextField
                 color="warning"
-                placeholder={t('synchronization.shopify.apiToken')}
+                placeholder={t('synchronization.shopify.apiToken.placeholder')}
                 value={shopifyCreds.apiToken}
                 onChange={handleShopifyChange('apiToken')}
                 className={classes.input}
-                ></Input>
-              <Input
+                error = {errorMessage.apiTokenError.length > 0}
+                helperText = {errorMessage.apiTokenError}
+                ></TextField>
+              <TextField
                 color="warning"
-                placeholder={t('synchronization.domainName')}
+                placeholder={t('synchronization.domainName.placeholder')}
                 value={shopifyCreds.shopDomain}
                 onChange={handleShopifyChange('shopDomain')}
                 className={classes.input}
-                ></Input>
+                error = {errorMessage.shopDomainShopifyError.length > 0}
+                helperText = {errorMessage.shopDomainShopifyError}
+                ></TextField>
               </Grid>
           )}
           {apiType === ApiType.WOOCOMMERCE && (
             <Grid item className={classes.innerForm} direction="column">
-              <Input
+              <TextField
                 color="warning"
-                placeholder={t('synchronization.domainName')}
+                placeholder={t('synchronization.domainName.placeholder')}
                 value={woocommerceCreds.shopDomain}
                 onChange={handleWoocommerceChange('shopDomain')}
                 className={classes.input}
-                ></Input>
-              <Input
+                error = {errorMessage.shopDomainWooError.length > 0}
+                helperText = {errorMessage.shopDomainWooError}
+                ></TextField>
+              <TextField
                 color="warning"
-                placeholder={t('synchronization.woocommerce.consumerKey')}
+                placeholder={t('synchronization.woocommerce.consumerKey.placeholder')}
                 value={woocommerceCreds.shopConsumerKey}
                 onChange={handleWoocommerceChange('shopConsumerKey')}
                 className={classes.input}
-                ></Input>
-                <Input
+                error = {errorMessage.shopConsumerKeyError.length > 0}
+                helperText = {errorMessage.shopConsumerKeyError}
+                ></TextField>
+                <TextField
                 color="warning"
-                placeholder={t('synchronization.woocommerce.consumerSecret')}
+                placeholder={t('synchronization.woocommerce.consumerSecret.placeholder')}
                 value={woocommerceCreds.shopConsumerSecret}
                 onChange={handleWoocommerceChange('shopConsumerSecret')}
                 className={classes.input}
-                ></Input>
+                error = {errorMessage.shopConsumerSecretError.length > 0}
+                helperText = {errorMessage.shopConsumerSecretError}
+                ></TextField>
             </Grid>
           )}
           <Button

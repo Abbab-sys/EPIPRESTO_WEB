@@ -55,14 +55,26 @@
     }
   },
   "synchronization": {
-    "domainName": "Nom de domaine",
+    "domainName": {
+      "placeholder": "Nom de domaine",
+      "errorMessage" :"Le nom du domaine ne peut pas être vide"
+    },
     "synchronize": "SYNCHRONISER",
     "shopify": {
-      "apiToken": "API Token"
+      "apiToken": {
+        "placeholder": "API Token",
+        "errorMessage": "Le token API ne peut pas être vide"
+      }
     },
     "woocommerce": {
-      "consumerKey": "Clé de consommateur du marché",
-      "consumerSecret": "Secret du consommateur"
+      "consumerKey": {
+        "placeholder": "Clé de consommateur du marché",
+        "errorMessage": "La clé de consommateur ne peut pas être vide"
+      },
+      "consumerSecret": {
+        "placeholder": "Secret du consommateur",
+      "errorMessage": "Le secret du consommateur ne peut pas être vide"
+      }
     }
   }
 }

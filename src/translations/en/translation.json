@@ -55,14 +55,26 @@
     }
   },
   "synchronization": {
-    "domainName": "Domain name",
+    "domainName": {
+      "placeholder": "Domain name",
+      "errorMessage": "The shop domain name can not be empty"
+    },
     "synchronize": "SYNCHRONIZE",
     "shopify": {
-      "apiToken": "API Token"
+      "apiToken": {
+        "placeholder" : "API Token",
+        "errorMessage": "The API Token can not be empty"
+      }
     },
     "woocommerce": {
-      "consumerKey": "Shop consumer key",
-      "consumerSecret": "Shop consumer secret"
+      "consumerKey": {
+        "placeholder":"Shop consumer key",
+        "errorMessage": "The consumer key can not be empty"
+      },
+      "consumerSecret": {
+        "placeholder": "Shop consumer secret",
+        "errorMessage": "The consumer secret can not be empty"
+      }
     }
   }
 }
