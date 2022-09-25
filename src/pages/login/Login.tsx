@@ -7,7 +7,6 @@ import {useLazyQuery} from '@apollo/client/react';
 import {LOGIN_BY_EMAIL, LOGIN_BY_USERNAME} from '../../queries';
 import {VendorContext} from '../../context/Vendor';
 import {useTranslation} from 'react-i18next';
-import LoadingButton from '@mui/lab/LoadingButton';
 
 const useStyles = makeStyles({
     root: {
@@ -67,8 +66,12 @@ const Login = () => {
         showPassword: false,
     })
     const [snackbarOpen, setSnackbarOpen] = useState(false)
-    const {setStoreId} = useContext(VendorContext);
-
+    const {storeId, setStoreId} = useContext(VendorContext);
+    useEffect(() => {
+        if (storeId.length>0) {
+            navigate('/synchronization')
+        }
+    }, [navigate, storeId]);
     const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
 
     const [loginByUsername] = useLazyQuery(LOGIN_BY_USERNAME);
@@ -121,9 +124,8 @@ const Login = () => {
                         password: credentials.password
                     }
                 })
-                if (await emailLoginResponse.data.loginVendorByEmail.code === 200) {
-                    setStoreId(await emailLoginResponse.data.loginVendorByEmail.vendorAccount.store._id)
-                    navigate("/synchronization")
+                if (emailLoginResponse.data.loginVendorByEmail.code === 200) {
+                    setStoreId(emailLoginResponse.data.loginVendorByEmail.vendorAccount.store._id)
                 } else {
                     setSnackbarOpen(true)
                 }
@@ -134,9 +136,9 @@ const Login = () => {
                         password: credentials.password
                     }
                 })
-                if (await usernameLoginResponse.data.loginVendorByUsername.code === 200) {
-                    setStoreId(await usernameLoginResponse.data.loginVendorByUsername.vendorAccount.store._id)
-                    navigate("/synchronization")
+                if (usernameLoginResponse.data.loginVendorByUsername.code === 200) {
+                    setStoreId(usernameLoginResponse.data.loginVendorByUsername.vendorAccount.store._id)
+
                 } else {
                     setSnackbarOpen(true)
                 }
@@ -152,7 +154,7 @@ const Login = () => {
             direction="column"
             className={classes.root}>
             <Grid container xs={4} className={classes.form} direction="column">
-                <img src={logo} height={"80px"} width={"200px"}></img>
+                <img src={logo} height={"80px"} width={"200px"} alt={"Épipresto logo"}></img>
                 <TextField
                     variant='standard'
                     className={classes.input}

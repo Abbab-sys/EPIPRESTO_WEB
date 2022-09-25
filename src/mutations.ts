@@ -9,7 +9,7 @@ export const SIGN_UP = gql`
   }
 `
 
-export const SYNCH_SHOPIFY = gql`
+export const SYNC_SHOPIFY = gql`
   mutation Mutation($shopifyCreds: ShopifyCredentials!) {
     synchronizeShopifyStore(shopifyCreds: $shopifyCreds) {
       code
@@ -18,7 +18,7 @@ export const SYNCH_SHOPIFY = gql`
   }
 `
 
-export const SYNCH_WOOCOMMERCE = gql`
+export const SYNC_WOOCOMMERCE = gql`
   mutation Mutation($woocommerceCreds: WoocommerceCredentials!) {
     synchronizeWoocommerceStore(woocommerceCreds: $woocommerceCreds) {
       code

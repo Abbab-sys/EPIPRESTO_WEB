@@ -18,7 +18,7 @@
   },
   "sign_up": {
     "createAccount": "Create an account",
-    "succesAccountCreation": "Your account has been succesfully created!",
+    "successAccountCreation": "Your account has been successfully created!",
     "errorAccountCreation": "Oops something went wrong",
     "shopName": {
       "placeholder": "Shop name",

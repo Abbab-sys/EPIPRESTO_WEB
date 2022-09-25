@@ -18,7 +18,7 @@
   },
   "sign_up": {
     "createAccount": "Créer un compte",
-    "succesAccountCreation": "Votre compte a été créé aves succès!",
+    "successAccountCreation": "Votre compte a été créé aves succès!",
     "errorAccountCreation": "Oops une erreur est survenues",
     "shopName": {
       "placeholder": "Nom du marché",
@@ -29,7 +29,7 @@
       "errors": {
         "empty": "Le champ du pseudonyme ne peut pas être vide",
         "used": "Ce pseudonyme est déjà utilisé"
-      } 
+      }
     },
     "address": {
       "placeholder": "Adresse",
