@@ -1,6 +1,6 @@
 import { Alert, Button, Grid, Link, Snackbar, TextField, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useLazyQuery } from '@apollo/client/react';
@@ -68,6 +68,10 @@ const Login = () => {
     showPassword: false,
   })
   const [snackbarOpen, setSnackbarOpen] = useState(false)
+  
+  useEffect(() => {
+    if(state.storeId.length > 0) navigate('/synchronization')
+  }, [navigate, state.storeId])
 
   const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
 
@@ -108,21 +112,18 @@ const Login = () => {
 
   const handleLogin = async () => {
     if(isValid()){
-      console.log("EMAIL: ", /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(credentials.email))
       if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(credentials.email)){
         const emailLoginResponse = await loginByEmail({variables: {email: credentials.email, password: credentials.password}})
-        console.log(emailLoginResponse)
-        if(emailLoginResponse.data.loginVendorByEmail.code === 200) {
-          state.setStoreId(emailLoginResponse.data.loginVendorByEmail.vendorAccount.store._id)
+        if(await emailLoginResponse.data.loginVendorByEmail.code === 200) {
+          state.setStoreId(await emailLoginResponse.data.loginVendorByEmail.vendorAccount.store._id)
           navigate("/synchronization")
         } else {
           setSnackbarOpen(true)
         }
       } else {
         const usernameLoginResponse = await loginByUsername({variables: {username: credentials.email, password: credentials.password}})
-        console.log(usernameLoginResponse)
-        if(usernameLoginResponse.data.loginVendorByUsername.code === 200) {
-          state.setStoreId(usernameLoginResponse.data.loginVendorByUsername.vendorAccount.store._id)
+        if(await usernameLoginResponse.data.loginVendorByUsername.code === 200) {
+          state.setStoreId(await usernameLoginResponse.data.loginVendorByUsername.vendorAccount.store._id)
           navigate("/synchronization")
         } else {
           setSnackbarOpen(true)

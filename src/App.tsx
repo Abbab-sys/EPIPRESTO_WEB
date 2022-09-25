@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/login/Login';
@@ -11,6 +11,7 @@ import { setContext } from '@apollo/client/link/context';
 import { useTranslation } from 'react-i18next';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Box, FormControl, InputLabel, MenuItem } from '@mui/material';
+import Protected from './pages/Protected';
 
 const useStyles = makeStyles({
   root: {
@@ -36,7 +37,6 @@ function App() {
   const [storeId, setStoreId] = useState<string>("");
   const [language, setLanguage] = useState(i18n.language);
   const value = { storeId, setStoreId };
-  useEffect(() => {console.log("UPDATE" + state.storeId)}, [state.storeId])
   const httpLink = createHttpLink({
     uri: 'http://localhost:4000/graphql',
   });
@@ -58,7 +58,7 @@ function App() {
     i18n.changeLanguage(event.target.value)
   };
   
-  console.log(state)
+  console.log("STORE ID: ", state.storeId)
 
   return (
     <VendorContext.Provider value={value}>
@@ -82,7 +82,11 @@ function App() {
               <Route path="*" element={<Navigate replace to="/login"/>}></Route>
               <Route element={<Login />} path="/login"></Route>
               <Route element={<SignUp />} path="/sign-up"></Route>
-              <Route element={<Synchronisation />} path="/synchronization"></Route>
+              <Route element={
+                <Protected isLoggedIn={state.storeId.length > 0}>
+                  <Synchronisation />
+                </Protected>
+                } path="/synchronization"></Route>
             </Routes>
           </Router>
         </div>
