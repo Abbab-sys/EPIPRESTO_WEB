@@ -77,7 +77,6 @@ const initialErrorState: ErrorMessage = {
 const Synchronisation = () => {
   const { t } = useTranslation('translation')
   const classes = useStyles();
-  const state = useContext(VendorContext)
   const [apiType, setApiType] = useState<ApiType>(ApiType.SHOPIFY);
   const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -167,12 +166,12 @@ const Synchronisation = () => {
   return(
     <Grid
       container
-      xs={12} 
+      xs={12}
       spacing={0}
       direction="column"
       className={classes.root}>
       <Grid container xs={3} className={classes.form} direction="column">
-        <ToggleButtonGroup 
+        <ToggleButtonGroup
           value={apiType}
           exclusive
           onChange={handleApi()}
@@ -239,7 +238,7 @@ const Synchronisation = () => {
           </Grid>
         )}
         <Button
-          variant="contained" 
+          variant="contained"
           style={{ background: '#ffa500', margin: '15px'}}
           onClick={handleSynchronisation}>
           {t('synchronization.synchronize')}

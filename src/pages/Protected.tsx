@@ -1,16 +1,16 @@
-import { Navigate } from "react-router-dom";
+import {Navigate} from "react-router-dom";
+import {useContext} from "react";
+import {VendorContext} from "../context/Vendor";
 
 interface ProtectedProps {
-  isLoggedIn: boolean;
-  children: any
+    children: any
 }
 
 const Protected = (props: ProtectedProps) => {
-
-  if (!props.isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
-  return props.children;
-};
-
+    const {storeId} = useContext(VendorContext);
+    if (storeId === "") {
+        return <Navigate to="/login"/>
+    }
+    return props.children
+}
 export default Protected;
