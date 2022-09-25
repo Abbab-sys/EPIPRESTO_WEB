@@ -8,14 +8,14 @@ export interface WoocommerceSyncInput {
     consumerKey: string,
     consumerSecretKey: string
 }
-export interface ErrorMessage {
+export interface SyncErrorMessage {
     apiTokenError: string;
     shopDomainShopifyError: string;
     shopDomainWooError: string;
     shopConsumerKeyError: string;
     shopConsumerSecretError: string;
 }
-export const initialErrorMessage: ErrorMessage = {
+export const initialSyncErrorMessage: SyncErrorMessage = {
     apiTokenError: '',
     shopDomainShopifyError: '',
     shopDomainWooError: '',

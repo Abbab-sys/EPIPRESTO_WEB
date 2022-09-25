@@ -1,147 +1,73 @@
 import {Alert, Button, Grid, Link, Snackbar, TextField, Typography} from '@mui/material'
-import {makeStyles} from '@mui/styles';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useReducer, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import {useLazyQuery} from '@apollo/client/react';
-import {LOGIN_BY_EMAIL, LOGIN_BY_USERNAME} from '../../queries';
+import {LOGIN_BY_EMAIL, LOGIN_BY_USERNAME} from '../../graphql/queries';
 import {VendorContext} from '../../context/Vendor';
 import {useTranslation} from 'react-i18next';
+import {loginStyles} from "./LoginStyles";
+import {
+    LOGIN_CREATE_ACCOUNT,
+    LOGIN_CREDENTIALS_ERROR,
+    LOGIN_EMAIL_KEY, LOGIN_LOGIN_KEY, LOGIN_NEW_TO_APP_KEY,
+    LOGIN_PASSWORD_KEY
+} from "../../translations/keys/LoginTranslationKeys";
 
-const useStyles = makeStyles({
-    root: {
-        background: "linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25))",
-        display: 'flex',
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: '100vh',
-        padding: '10px'
-    },
-    form: {
-        display: 'flex',
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: '10px',
-        boxShadow: "0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)",
-        background: 'white',
-    },
-    input: {
-        margin: '15px !important',
-        width: "85%"
-    },
-    link: {
-        margin: '15px',
-        '&:hover': {
-            cursor: 'pointer'
-        }
-    },
-    button: {
-        boxShadow: "0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12)"
-    }
-})
+import {
+    initialLoginCredentialsStateReducer,
+    LoginCredentialsReducerState
+} from "./reducers/LoginCredentialsReducerState";
+import {loginCredentialsReducer} from "./reducers/LoginCredentialsReducer";
 
-interface Credentials {
-    email: string,
-    password: string,
-    showPassword: boolean
-}
-
-interface ErrorMessage {
-    emailError: string;
-    passwordError: string;
-}
-
-const initialErrorState: ErrorMessage = {
-    emailError: '',
-    passwordError: '',
-}
 
 const Login = () => {
-    const {t} = useTranslation('translation')
-    const classes = useStyles()
+    const {t: translation} = useTranslation('translation')
+    const classes = loginStyles()
     const navigate = useNavigate()
-    const [credentials, setCredentials] = useState<Credentials>({
-        email: "",
-        password: "",
-        showPassword: false,
-    })
-    const [snackbarOpen, setSnackbarOpen] = useState(false)
     const {storeId, setStoreId} = useContext(VendorContext);
     useEffect(() => {
-        if (storeId.length>0) {
+        if (storeId.length > 0) {
             navigate('/synchronization')
         }
     }, [navigate, storeId]);
-    const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
 
+    const [{credentials, errorMessage}, dispatchCredentialsState]
+        = useReducer(loginCredentialsReducer, initialLoginCredentialsStateReducer);
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
     const [loginByUsername] = useLazyQuery(LOGIN_BY_USERNAME);
 
-    const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
 
-    const handleChange =
-        (prop: keyof Credentials, errorProp: keyof ErrorMessage) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setErrorMessage((oldErrorMessage) => ({...oldErrorMessage, [errorProp]: ""}));
-            setCredentials({...credentials, [prop]: event.target.value});
-        };
-
-    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
             return;
         }
         setSnackbarOpen(false);
     };
 
-    const handleErrorChange =
-        (prop: keyof ErrorMessage, message: string) => {
-            setErrorMessage((oldErrorMessage) => ({...oldErrorMessage, [prop]: message}));
-        };
-
-    const handleCreateAccount = () => {
-        navigate("/sign-up")
-    }
-
-    const isValid = () => {
-        setErrorMessage(initialErrorState);
-        let isAllValid = true
-        if (credentials.email.length === 0) {
-            handleErrorChange("emailError", t('login.errorMessages.emailError'));
-            isAllValid = false
-        }
-        if (credentials.password.length === 0) {
-            handleErrorChange("passwordError", t('login.errorMessages.passwordError'));
-            isAllValid = false
-        }
-        console.log("VALID: ", isAllValid)
-        return isAllValid
+    function areAllCredentialsFieldsValid(credsState: LoginCredentialsReducerState): boolean {
+        return credsState.credentials.auth.length > 0 && credsState.credentials.password.length > 0
     }
 
     const handleLogin = async () => {
-        if (isValid()) {
-            if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(credentials.email)) {
-                const emailLoginResponse = await loginByEmail({
-                    variables: {
-                        email: credentials.email,
-                        password: credentials.password
-                    }
-                })
-                if (emailLoginResponse.data.loginVendorByEmail.code === 200) {
-                    setStoreId(emailLoginResponse.data.loginVendorByEmail.vendorAccount.store._id)
-                } else {
-                    setSnackbarOpen(true)
-                }
-            } else {
-                const usernameLoginResponse = await loginByUsername({
-                    variables: {
-                        username: credentials.email,
-                        password: credentials.password
-                    }
-                })
-                if (usernameLoginResponse.data.loginVendorByUsername.code === 200) {
-                    setStoreId(usernameLoginResponse.data.loginVendorByUsername.vendorAccount.store._id)
+        dispatchCredentialsState({type: 'CHECK_LOGIN_CREDENTIALS'})
+        const areCredentialsValid = areAllCredentialsFieldsValid({credentials, errorMessage})
 
-                } else {
-                    setSnackbarOpen(true)
-                }
+        if (areCredentialsValid) {
+            const isAuthEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(credentials.auth)
+            const loginResponse = isAuthEmail
+                ? await loginByEmail({variables: {email: credentials.auth, password: credentials.password}})
+                : await loginByUsername({variables: {username: credentials.auth, password: credentials.password}})
+
+            const serverResponse= (isAuthEmail)? loginResponse.data.loginVendorByEmail : loginResponse.data.loginVendorByUsername
+            const loggedWithSuccess =serverResponse.code
+
+            if (loggedWithSuccess) {
+                setStoreId(serverResponse.vendorAccount.store._id)
+            } else {
+                setSnackbarOpen(true)
             }
         }
     }
@@ -159,43 +85,49 @@ const Login = () => {
                     variant='standard'
                     className={classes.input}
                     color="warning"
-                    placeholder={t('login.email')}
-                    value={credentials.email}
-                    onChange={handleChange('email', 'emailError')}
-                    error={errorMessage.emailError.length > 0}
-                    helperText={errorMessage.emailError}
+                    placeholder={translation(LOGIN_EMAIL_KEY)}
+                    value={credentials.auth}
+                    onChange={(event) => dispatchCredentialsState({
+                        type: "CHANGE_AUTH",
+                        newAuth: event.target.value
+                    })}
+                    error={errorMessage.authErrorTranslationKey.length > 0}
+                    helperText={translation(errorMessage.authErrorTranslationKey)}
                 />
                 <TextField
                     variant='standard'
                     className={classes.input}
                     color="warning"
-                    placeholder={t('login.password')}
+                    placeholder={translation(LOGIN_PASSWORD_KEY)}
                     type={
                         credentials.showPassword ? 'text' :
                             'password'}
                     value={credentials.password}
-                    onChange={handleChange('password', 'passwordError')}
-                    error={errorMessage.passwordError.length > 0}
-                    helperText={errorMessage.passwordError}
+                    onChange={(event) => dispatchCredentialsState({
+                        type: "CHANGE_PASSWORD",
+                        newPassword: event.target.value
+                    })}
+                    error={errorMessage.passwordErrorTranslationKey.length > 0}
+                    helperText={translation(errorMessage.passwordErrorTranslationKey)}
                 />
                 <Button
                     variant="contained"
                     style={{background: '#ffa500', margin: '15px'}}
                     onClick={handleLogin}>
-                    {t('login.login')}
+                    {translation(LOGIN_LOGIN_KEY)}
                 </Button>
                 <Typography display="inline-block">
-                    {t('login.newTo')}
+                    {translation(LOGIN_NEW_TO_APP_KEY)}
                 </Typography>
-                <Link style={{margin: '15px'}} className={classes.link} onClick={handleCreateAccount}>
-                    {t('login.createAccount')}
+                <Link style={{margin: '15px'}} className={classes.link} onClick={() => navigate("/sign-up")}>
+                    {translation(LOGIN_CREATE_ACCOUNT)}
                 </Link>
                 <Snackbar
                     open={snackbarOpen}
                     autoHideDuration={6000}
-                    onClose={handleClose}>
-                    <Alert onClose={handleClose} severity="error" sx={{width: '100%'}}>
-                        {t('login.errorMessages.credentialsError')}
+                    onClose={handleSnackbarClosing}>
+                    <Alert onClose={handleSnackbarClosing} severity="error" sx={{width: '100%'}}>
+                        {translation(LOGIN_CREDENTIALS_ERROR)}
                     </Alert>
                 </Snackbar>
             </Grid>

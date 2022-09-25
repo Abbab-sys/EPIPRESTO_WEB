@@ -3,9 +3,9 @@ import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { SIGN_UP } from '../../mutations';
+import { SIGN_UP } from '../../graphql/mutations';
 import { useNavigate } from 'react-router-dom';
-import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../queries';
+import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../graphql/queries';
 import { useTranslation } from 'react-i18next';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Snackbar from '@mui/material/Snackbar';

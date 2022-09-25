@@ -3,7 +3,7 @@ import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
 import React, {useReducer, useState} from 'react';
 import {useMutation} from '@apollo/client';
-import {SYNC_SHOPIFY, SYNC_WOOCOMMERCE} from '../../mutations';
+import {SYNC_SHOPIFY, SYNC_WOOCOMMERCE} from '../../graphql/mutations';
 import {useTranslation} from 'react-i18next';
 import {synchronisationStyles} from "./SynchronisationStyles";
 import {
@@ -14,9 +14,9 @@ import {
 } from "../../translations/keys/SynchronizationKeys";
 import {ApiType} from "../../enums/SynchronizationEnums";
 import {
-    credentialsReducer
-} from "./reducers/CredentialsReducer";
-import {CredentialsStateReducer, initialCredentialsStateReducer} from "./reducers/CredentialsReducerState";
+    syncCredentialsReducer
+} from "./reducers/SyncCredentialsReducer";
+import {SyncCredentialsReducerState, initialSyncCredentialsStateReducer} from "./reducers/SyncCredentialsReducerState";
 
 const Synchronisation = () => {
     const {t: translation} = useTranslation('translation')
@@ -26,7 +26,7 @@ const Synchronisation = () => {
     const [syncError, setSyncError] = useState(false);
 
     const [{shopifyCredentials, errorMessage, apiType, woocommerceCredentials}, dispatchCredentialsState]
-        = useReducer(credentialsReducer, initialCredentialsStateReducer);
+        = useReducer(syncCredentialsReducer, initialSyncCredentialsStateReducer);
 
     const [synchronizeShopifyStore] = useMutation(SYNC_SHOPIFY);
     const [synchronizeWoocommerceStore] = useMutation(SYNC_WOOCOMMERCE);
@@ -38,12 +38,7 @@ const Synchronisation = () => {
         setSnackbarOpen(false);
     };
 
-    const isValid = (): boolean => {
-        dispatchCredentialsState({type: 'CHECK_CREDENTIALS'})
-        return areAllCredentialsFieldsValid({apiType, shopifyCredentials, woocommerceCredentials, errorMessage});
-    }
-
-    function areAllCredentialsFieldsValid(credsState: CredentialsStateReducer): boolean {
+    function areAllCredentialsFieldsValid(credsState: SyncCredentialsReducerState): boolean {
         if (credsState.apiType === ApiType.SHOPIFY) {
             return credsState.shopifyCredentials.apiToken !== "" && credsState.shopifyCredentials.shopDomain !== "";
         }
@@ -51,7 +46,8 @@ const Synchronisation = () => {
     }
 
     const handleSynchronisation = async () => {
-        const areCredentialsValid = isValid();
+        dispatchCredentialsState({type: 'CHECK_CREDENTIALS'})
+        const areCredentialsValid = areAllCredentialsFieldsValid({apiType, shopifyCredentials, woocommerceCredentials, errorMessage});
         if (areCredentialsValid) {
             let syncResponse = (apiType === ApiType.SHOPIFY)
                 ? await synchronizeShopifyStore({variables: {shopifyCreds: shopifyCredentials}})

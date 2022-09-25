@@ -1,6 +1,6 @@
 import {ApiType} from "../../../enums/SynchronizationEnums"
 
-export type CredentialsStateReducerAction =
+export type SyncCredentialsStateReducerAction =
     | { type: 'CHANGE_API', newApi: ApiType }
     | { type: 'CHANGE_SHOPIFY_API_TOKEN', newApiToken: string }
     | { type: 'CHANGE_SHOPIFY_DOMAIN_NAME', newDomainName: string }

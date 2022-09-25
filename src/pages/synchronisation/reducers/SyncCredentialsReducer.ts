@@ -1,15 +1,15 @@
 import {ApiType} from "../../../enums/SynchronizationEnums";
 import {
-    initialErrorMessage,
+    initialSyncErrorMessage,
 } from "../../../interfaces/SynchronisationInterfaces";
 import {
     SYNCHRONIZATION_DOMAIN_NAME_ERROR_MESSAGE_KEY,
     SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY, SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_ERROR_MESSAGE_KEY
 } from "../../../translations/keys/SynchronizationKeys";
-import {CredentialsStateReducer} from "./CredentialsReducerState";
-import {CredentialsStateReducerAction} from "./CredentialsReducerActions";
+import {SyncCredentialsReducerState} from "./SyncCredentialsReducerState";
+import {SyncCredentialsStateReducerAction} from "./SyncCredentialsReducerActions";
 
-export function credentialsReducer(state: CredentialsStateReducer, action: CredentialsStateReducerAction): CredentialsStateReducer {
+export function syncCredentialsReducer(state: SyncCredentialsReducerState, action: SyncCredentialsStateReducerAction): SyncCredentialsReducerState {
     switch (action.type) {
         case 'CHANGE_SHOPIFY_API_TOKEN':
             return {
@@ -74,11 +74,11 @@ export function credentialsReducer(state: CredentialsStateReducer, action: Crede
         case 'CHANGE_API':
             return {
                 ...state,
-                errorMessage: initialErrorMessage,
+                errorMessage: initialSyncErrorMessage,
                 apiType: action.newApi
             };
         case 'CHECK_CREDENTIALS':
-            const errorMessage = {...initialErrorMessage};
+            const errorMessage = {...initialSyncErrorMessage};
 
             if (state.apiType === ApiType.SHOPIFY && state.shopifyCredentials.apiToken === "")
                 errorMessage.apiTokenError = SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY;

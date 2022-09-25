@@ -1,19 +1,19 @@
 import {
-    ErrorMessage,
-    initialErrorMessage,
+    SyncErrorMessage,
+    initialSyncErrorMessage,
     ShopifySyncInput,
     WoocommerceSyncInput
 } from "../../../interfaces/SynchronisationInterfaces";
 import {ApiType} from "../../../enums/SynchronizationEnums";
 
-export interface CredentialsStateReducer {
+export interface SyncCredentialsReducerState {
     shopifyCredentials: ShopifySyncInput;
     woocommerceCredentials: WoocommerceSyncInput;
-    errorMessage: ErrorMessage;
+    errorMessage: SyncErrorMessage;
     apiType: ApiType;
 }
 
-export const initialCredentialsStateReducer: CredentialsStateReducer = {
+export const initialSyncCredentialsStateReducer: SyncCredentialsReducerState = {
     shopifyCredentials: {
         apiToken: '',
         shopDomain: ''
@@ -23,6 +23,6 @@ export const initialCredentialsStateReducer: CredentialsStateReducer = {
         consumerKey: '',
         consumerSecretKey: ''
     },
-    errorMessage: initialErrorMessage,
+    errorMessage: initialSyncErrorMessage,
     apiType: ApiType.SHOPIFY
 }
