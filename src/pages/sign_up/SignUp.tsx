@@ -1,301 +1,233 @@
-import { Alert, Button, Grid, Input, styled, TextField } from '@mui/material'
-import { makeStyles } from '@mui/styles';
-import { useState } from 'react';
+import {Alert, Button, Grid, TextField} from '@mui/material'
+import React, {useReducer, useState} from 'react';
 import logo from '../../assets/logo.png';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { SIGN_UP } from '../../graphql/mutations';
-import { useNavigate } from 'react-router-dom';
-import { IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED } from '../../graphql/queries';
-import { useTranslation } from 'react-i18next';
-import LoadingButton from '@mui/lab/LoadingButton';
+import {useLazyQuery, useMutation} from '@apollo/client'
+import {SIGN_UP} from '../../graphql/mutations';
+import {useNavigate} from 'react-router-dom';
+import {IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED} from '../../graphql/queries';
+import {useTranslation} from 'react-i18next';
 import Snackbar from '@mui/material/Snackbar';
-//import PhoneInput from 'react-phone-number-input'
-//import 'react-phone-number-input/style.css'
+import {signUpStyles} from "./SignUpStyles";
+import {initialSignUpCredentialsState} from "./reducers/SignUpCredentialsReducerState";
+import {signUpCredentialsReducer} from "./reducers/SignUpCredentialsReducer";
+import {
+    SIGN_UP_ADRESS_PLACEHOLDER_KEY,
+    SIGN_UP_CONFIRM_PASSWORD_PLACEHOLDER_KEY,
+    SIGN_UP_CREATE_ACCOUNT_KEY,
 
+    SIGN_UP_EMAIL_PLACEHOLDER_KEY,
+    SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
+    SIGN_UP_PASSWORD_PLACEHOLDER_KEY
+    , SIGN_UP_PHONE_PLACEHOLDER,
 
-const useStyles = makeStyles({
-  root: {
-    background: "linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25))",
-    display: 'flex',
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "10px",
-    minHeight: '100vh',
-  },
-  form: {
-    display: 'flex',
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: '10px',
-    boxShadow:"0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)",
-    background: 'white',
-  },
-  innerForm: {
-    display: 'flex',
-    alignItems: "center",
-    justifyContent: "center",
-    width: "90%",
-  },
-  input: {
-    margin: '15px !important',
-    width: "100%"
-  },
-  button: {
-    boxShadow: "0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12)"
-  }
-})
+    SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY,
 
-interface AccountInput {
-  shopName: string;
-  email: string;
-  address: string;
-  phone: string;
-  username: string;
-  password: string;
-}
+    SIGN_UP_USERNAME_PLACEHOLDER_KEY
+} from "../../translations/keys/SignUpTranslationKeys";
 
-interface ErrorMessage {
-  shopNameError: string;
-  emailError: string;
-  addressError: string;
-  phoneError: string;
-  usernameError: string;
-  passwordError: string;
-  verifyPasswordError: string;
-}
-
-const initialErrorState: ErrorMessage = {
-  shopNameError: '',
-  emailError: '',
-  addressError: '',
-  phoneError: '',
-  usernameError: '',
-  passwordError: '',
-  verifyPasswordError: ''
-}
 
 const SignUp = () => {
-  const { t } = useTranslation('translation')
-  const classes = useStyles()
-  const navigate = useNavigate()
-  const [verifyPassword, setVerifyPassword] = useState<string>('')
-  const [accountInput, setAccountInput] = useState<AccountInput>({
-    shopName: '',
-    username: '',
-    address: '',
-    email: '',
-    phone: '',
-    password: ''
-  });
-  const [errorOpen, setErrorOpen] = useState(false);
+    const {t: translation} = useTranslation('translation')
+    const classes = signUpStyles()
+    const navigate = useNavigate()
 
-  const [isEmailUnique] = useLazyQuery(IS_VENDOR_EMAIL_USED);
+    const [{verifyPassword, accountInput, signUpErrorMessage}, dispatchCredentialsState]
+        = useReducer(signUpCredentialsReducer, initialSignUpCredentialsState);
 
-  const [isUsernameUnique] = useLazyQuery(IS_VENDOR_USERNAME_USED);
+    const [errorOpen, setErrorOpen] = useState(false);
 
-  const [errorMessage, setErrorMessage] = useState<ErrorMessage>(initialErrorState);
+    const [isEmailUsed] = useLazyQuery(IS_VENDOR_EMAIL_USED);
+    const [isUsernameUsed] = useLazyQuery(IS_VENDOR_USERNAME_USED);
+    const [signUp] = useMutation(SIGN_UP);
 
-  const [signUp, { loading, error, data }] = useMutation(SIGN_UP);
-
-  const handleChange =
-    (accountInputProp: keyof AccountInput, errorMessageProp: keyof ErrorMessage) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [errorMessageProp]: "" }));
-      setAccountInput({ ...accountInput, [accountInputProp]: event.target.value });
-    };
-
-  const handleErrorChange =
-    (prop: keyof ErrorMessage, message: string) => {
-      setErrorMessage((oldErrorMessage) => ({ ...oldErrorMessage, [prop]: message }));
-    };
-
-  const handleVerifyPasswordChange = () => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVerifyPassword(event.target.value)
-  }
-
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setErrorOpen(false);
-  };
-
-  const isValid = async () => {
-    setErrorMessage(initialErrorState);
-    let isAllValid = true
-    if(accountInput.shopName.length === 0) {handleErrorChange("shopNameError", t('sign_up.shopName.errorMessage')); isAllValid = false}
-    if(accountInput.username.length === 0) {handleErrorChange("usernameError", t('sign_up.username.errors.empty')); isAllValid = false}
-    else {
-     const response= await isUsernameUnique({variables: {username: accountInput.username}})
-      if(response.loading) {
-        //TODO: HANDLE LOADING
-      } else if(response.error) {
-        //TODO: HANDLE ERROR
-      } else if(response.data.isVendorUsernameUsed) {
-        {handleErrorChange("usernameError", t('sign_up.username.errors.used')); isAllValid = false}
-      }
-    }
-    if(accountInput.address.length === 0) {handleErrorChange("addressError", t('sign_up.address.errorMessage')); isAllValid = false}
-    if(accountInput.phone.length === 0) {handleErrorChange("phoneError", t('sign_up.phone.errorMessage')); isAllValid = false}
-    if(accountInput.email.length === 0) {handleErrorChange("emailError", t('sign_up.email.errors.empty')); isAllValid = false}
-    else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(accountInput.email)){
-      handleErrorChange("emailError", t('sign_up.email.errors.formatError'));
-      isAllValid = false
-    }
-    else {
-      const response= await isEmailUnique({variables: {email: accountInput.email}})
-      if(response.loading) {
-        //TODO: HANDLE LOADING
-      } else if(response.error) {
-        //TODO: HANDLE ERROR
-      } else if(response.data.isVendorEmailUsed) {
-        {handleErrorChange("emailError", t('sign_up.email.errors.used')); isAllValid = false}
-      }
-    }
-    if(accountInput.password.length === 0) {handleErrorChange("passwordError", t('sign_up.password.errorMessage')); isAllValid = false}
-    if(verifyPassword !== accountInput.password) {handleErrorChange("verifyPasswordError", t('sign_up.confirmPassword.errorMessage')); isAllValid = false}
-    return isAllValid
-  }
-
-  const handleCreateAccount = async () => {
-    const is_valid = await isValid()
-    if(is_valid){
-      const response=await signUp({ variables: { accountInput: accountInput } })
-      if(response.data.vendorSignUp.code === 200){
-        navigate("/login")
-      }else{
-        setErrorOpen(true)
-      }
-    }
-  }
-
-  return(
-    <Grid
-      container
-      xs={12}
-      spacing={0}
-      direction="column"
-      className={classes.root}>
-      <Grid container xs={4} className={classes.form} direction="column">
-        <Grid container className={classes.innerForm}>
-          <img src={logo} height={"80px"} width={"200px"}></img>
-        </Grid>
-        <Grid item direction="row" className={classes.innerForm}>
-          <TextField
-            variant='standard'
-            color="warning"
-            className={classes.input}
-            placeholder={t('sign_up.shopName.placeholder')}
-            value={accountInput.shopName}
-            onChange={handleChange('shopName', 'shopNameError')}
-            error = {errorMessage.shopNameError.length > 0}
-            helperText = {errorMessage.shopNameError}
-            />
-        </Grid>
-        <Grid item direction="row" className={classes.innerForm}>
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            placeholder={t('sign_up.username.placeholder')}
-            value={accountInput.username}
-            onChange={handleChange('username', 'usernameError')}
-            error = {errorMessage.usernameError.length > 0}
-            helperText = {errorMessage.usernameError}
-          />
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            placeholder={t('sign_up.address.placeholder')}
-            value={accountInput.address}
-            onChange={handleChange('address', 'addressError')}
-            error = {errorMessage.addressError.length > 0}
-            helperText = {errorMessage.addressError}
-          />
-        </Grid>
-        <Grid item direction="row" className={classes.innerForm}>
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            placeholder={t('sign_up.email.placeholder')}
-            value={accountInput.email}
-            onChange={handleChange('email', 'emailError')}
-            error = {errorMessage.emailError.length > 0}
-            helperText = {errorMessage.emailError}
-          />
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            placeholder={t('sign_up.phone.placeholder')}
-            value={accountInput.phone}
-            onChange={handleChange('phone', 'phoneError')}
-            error = {errorMessage.phoneError.length > 0}
-            helperText = {errorMessage.phoneError}
-          />
-          {/* <PhoneInput
-            className={classes.input}
-            defaultCountry='CA'
-            placeholder={t('sign_up.phone.placeholder')}
-            value={accountInput.phone}
-            onChange={(phoneNumber) => handleChange('phone', 'phoneError')}
-            helperText = "TEST"
-            /> */}
-        </Grid>
-        <Grid item direction="row" className={classes.innerForm}>
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            placeholder={t('sign_up.password.placeholder')}
-            type={'password'}
-            value={accountInput.password}
-            onChange={handleChange('password', 'passwordError')}
-            error = {errorMessage.passwordError.length > 0}
-            helperText = {errorMessage.passwordError}
-            />
-          <TextField
-            variant='standard'
-            className={classes.input}
-            color="warning"
-            type={'password'}
-            value={verifyPassword}
-            placeholder={t('sign_up.confirmPassword.placeholder')}
-            onChange={handleVerifyPasswordChange()}
-            error = {errorMessage.verifyPasswordError.length > 0}
-            helperText = {errorMessage.verifyPasswordError}
-            />
-        </Grid>
-        {false ? (
-          <LoadingButton
-            size="small"
-            loading={false}
-            variant="contained"
-            style={{ background: '#ffa500', margin: '15px'}}
-          >
-            {t('sign_up.createAccount')}
-          </LoadingButton>
-          ) : (
-          <Button
-            variant="contained"
-            style={{ background: '#ffa500', margin: '15px'}}
-            onClick={handleCreateAccount}>
-                {t('sign_up.createAccount')}
-            </Button>
-          )
+    const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
         }
-        <Snackbar
-          open={errorOpen}
-          autoHideDuration={6000}
-          onClose={handleClose}>
-          <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-            {t('sign_up.errorAccountCreation')}
-          </Alert>
-        </Snackbar>
-      </Grid>
-    </Grid>
-  )
+        setErrorOpen(false);
+    };
+
+    function areAllCredentialsFieldsValid(): boolean {
+        const currErrorMessages = signUpErrorMessage;
+        return currErrorMessages.emailError === '' &&
+            currErrorMessages.usernameError === '' &&
+            currErrorMessages.passwordError === '' &&
+            currErrorMessages.verifyPasswordError === '' &&
+            currErrorMessages.shopNameError === '' &&
+            currErrorMessages.addressError === '' &&
+            currErrorMessages.phoneError === '';
+    }
+
+    const handleCreateAccount = async () => {
+        dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
+        const areCredentialsValid = areAllCredentialsFieldsValid()
+        if (areCredentialsValid) {
+            const response = await signUp({variables: {accountInput: accountInput}})
+            if (response.data.vendorSignUp.code === 200) {
+                navigate("/login")
+            } else {
+                setErrorOpen(true)
+            }
+        }
+    }
+
+    return (
+        <Grid
+            container
+            xs={12}
+            spacing={0}
+            direction="column"
+            className={classes.root}>
+            <Grid container xs={4} className={classes.form} direction="column">
+                <Grid container className={classes.innerForm}>
+                    <img src={logo} height={"80px"} width={"200px"} alt={"Épipresto logo"}></img>
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        color="warning"
+                        className={classes.input}
+                        placeholder={translation(SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY)}
+                        value={accountInput.shopName}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_SHOP_NAME",
+                            newShopName: event.target.value
+                        })}
+                        error={signUpErrorMessage.shopNameError.length > 0}
+                        helperText={translation(signUpErrorMessage.shopNameError)}
+                    />
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(SIGN_UP_USERNAME_PLACEHOLDER_KEY)}
+                        value={accountInput.username}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_USERNAME",
+                            newUsername: event.target.value
+                        })}
+                        onBlur={async () => {
+                            const response = await isUsernameUsed({variables: {username: accountInput.username}})
+                            if (response.data.isVendorUsernameUsed) {
+                                dispatchCredentialsState({
+                                    type: "SET_USERNAME_AS_ALREADY_USED",
+                                })
+                            } else {
+                                dispatchCredentialsState({
+                                    type: "SET_USERNAME_AS_UNUSED",
+                                })
+                            }
+                        }
+                        }
+                        error={signUpErrorMessage.usernameError.length > 0}
+                        helperText={translation(signUpErrorMessage.usernameError)}
+                    />
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(SIGN_UP_ADRESS_PLACEHOLDER_KEY)}
+                        value={accountInput.address}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_ADDRESS",
+                            newAddress: event.target.value
+                        })}
+                        error={signUpErrorMessage.addressError.length > 0}
+                        helperText={translation(signUpErrorMessage.addressError)}
+                    />
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(SIGN_UP_EMAIL_PLACEHOLDER_KEY)}
+                        value={accountInput.email}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_EMAIL",
+                            newEmail: event.target.value
+                        })}
+                        onBlur={async () => {
+                            const response = await isEmailUsed({variables: {email: accountInput.email}})
+                            if (response.data.isVendorEmailUsed) {
+                                dispatchCredentialsState({
+                                    type: "SET_EMAIL_AS_ALREADY_USED",
+                                })
+                            } else {
+                                dispatchCredentialsState({
+                                    type: "SET_EMAIL_AS_UNUSED",
+                                })
+                            }
+                        }}
+                        error={signUpErrorMessage.emailError.length > 0}
+                        helperText={translation(signUpErrorMessage.emailError)}
+                    />
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(SIGN_UP_PHONE_PLACEHOLDER)}
+                        value={accountInput.phone}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_PHONE",
+                            newPhone: event.target.value
+                        })}
+                        error={signUpErrorMessage.phoneError.length > 0}
+                        helperText={translation(signUpErrorMessage.phoneError)}
+                    />
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(SIGN_UP_PASSWORD_PLACEHOLDER_KEY)}
+                        type={'password'}
+                        value={accountInput.password}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_PASSWORD",
+                            newPassword: event.target.value
+                        })}
+                        error={signUpErrorMessage.passwordError.length > 0}
+                        helperText={translation(signUpErrorMessage.passwordError)}
+                    />
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        type={'password'}
+                        value={verifyPassword}
+                        placeholder={translation(SIGN_UP_CONFIRM_PASSWORD_PLACEHOLDER_KEY)}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_CONFIRM_PASSWORD",
+                            newConfirmPassword: event.target.value
+                        })}
+                        error={signUpErrorMessage.verifyPasswordError.length > 0}
+                        helperText={translation(signUpErrorMessage.verifyPasswordError)}
+                    />
+                </Grid>
+                {(
+                    <Button
+                        variant="contained"
+                        style={{background: '#ffa500', margin: '15px'}}
+                        onClick={handleCreateAccount}>
+                        {translation(SIGN_UP_CREATE_ACCOUNT_KEY)}
+                    </Button>
+                )
+                }
+                <Snackbar
+                    open={errorOpen}
+                    autoHideDuration={6000}
+                    onClose={handleSnackbarClosing}>
+                    <Alert onClose={handleSnackbarClosing} severity="error" sx={{width: '100%'}}>
+                        {translation(SIGN_UP_ERROR_ACCOUNT_CREATION_KEY)}
+                    </Alert>
+                </Snackbar>
+            </Grid>
+        </Grid>
+    )
 }
 
 export default SignUp
