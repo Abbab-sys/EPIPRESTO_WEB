@@ -17,9 +17,15 @@ export const loginStyles = makeStyles({
         boxShadow: "0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)",
         background: 'white',
     },
+    innerForm: {
+        display: 'flex',
+        alignItems: "center",
+        justifyContent: "center",
+        width: "90%",
+    },
     input: {
         margin: '15px !important',
-        width: "85%"
+        width: "100%"
     },
     link: {
         margin: '15px',

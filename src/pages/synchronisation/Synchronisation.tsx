@@ -1,7 +1,7 @@
 import {Alert, Button, Grid, Snackbar, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
 import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
-import React, {useReducer, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import {useMutation} from '@apollo/client';
 import {SYNC_SHOPIFY, SYNC_WOOCOMMERCE} from '../../graphql/mutations';
 import {useTranslation} from 'react-i18next';
@@ -58,6 +58,12 @@ const Synchronisation = () => {
         setSyncError(true)
         setSnackbarOpen(true)
     }
+
+    useEffect(() => {
+        document.onkeydown = (event) => {
+            if(event.key === "Enter") handleSynchronisation()
+        }
+    },);
 
     return (
         <Grid

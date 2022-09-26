@@ -1,5 +1,5 @@
 import {Alert, Button, Grid, TextField} from '@mui/material'
-import React, {useReducer, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import logo from '../../assets/logo.png';
 import {useLazyQuery, useMutation} from '@apollo/client'
 import {SIGN_UP} from '../../graphql/mutations';
@@ -49,19 +49,19 @@ const SignUp = () => {
 
   function areAllCredentialsFieldsValid(): boolean {
     const currErrorMessages = signUpErrorMessage;
-    return currErrorMessages.emailError === '' &&
-      currErrorMessages.usernameError === '' &&
-      currErrorMessages.passwordError === '' &&
-      currErrorMessages.verifyPasswordError === '' &&
-      currErrorMessages.shopNameError === '' &&
-      currErrorMessages.addressError === '' &&
+    return currErrorMessages.emailError === '' ||
+      currErrorMessages.usernameError === '' ||
+      currErrorMessages.passwordError === '' ||
+      currErrorMessages.verifyPasswordError === '' ||
+      currErrorMessages.shopNameError === '' ||
+      currErrorMessages.addressError === '' ||
       currErrorMessages.phoneError === '';
   }
 
   const handleCreateAccount = async () => {
     dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
     const areCredentialsValid = areAllCredentialsFieldsValid()
-    if (areCredentialsValid) {
+    if (!areCredentialsValid) {
       const response = await signUp({variables: {accountInput: accountInput}})
       if (response.data.vendorSignUp.code === 200) {
         navigate("/login")
@@ -70,6 +70,12 @@ const SignUp = () => {
       }
     }
   }
+
+  useEffect(() => {
+    document.onkeydown = (event) => {
+        if(event.key === "Enter") handleCreateAccount()
+    }
+  },);
 
   return (
     <Grid

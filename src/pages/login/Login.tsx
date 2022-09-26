@@ -1,5 +1,5 @@
 import {Alert, Button, Grid, Link, Snackbar, TextField, Typography} from '@mui/material'
-import React, {useContext, useEffect, useReducer, useState} from 'react';
+import React, {MutableRefObject, useContext, useEffect, useReducer, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import {useLazyQuery} from '@apollo/client/react';
@@ -39,6 +39,11 @@ const Login = () => {
     const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
     const [loginByUsername] = useLazyQuery(LOGIN_BY_USERNAME);
 
+    useEffect(() => {
+        document.onkeydown = (event) => {
+            if(event.key === "Enter") handleLogin()
+        }
+    },);
 
     const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
@@ -81,47 +86,59 @@ const Login = () => {
             className={classes.root}>
             <Grid container xs={4} className={classes.form} direction="column">
                 <img src={logo} height={"80px"} width={"200px"} alt={"Épipresto logo"}></img>
-                <TextField
-                    variant='standard'
-                    className={classes.input}
-                    color="warning"
-                    placeholder={translation(LOGIN_EMAIL_KEY)}
-                    value={credentials.auth}
-                    onChange={(event) => dispatchCredentialsState({
-                        type: "CHANGE_AUTH",
-                        newAuth: event.target.value
-                    })}
-                    error={errorMessage.authErrorTranslationKey.length > 0}
-                    helperText={translation(errorMessage.authErrorTranslationKey)}
-                />
-                <TextField
-                    variant='standard'
-                    className={classes.input}
-                    color="warning"
-                    placeholder={translation(LOGIN_PASSWORD_KEY)}
-                    type={
-                        credentials.showPassword ? 'text' :
-                            'password'}
-                    value={credentials.password}
-                    onChange={(event) => dispatchCredentialsState({
-                        type: "CHANGE_PASSWORD",
-                        newPassword: event.target.value
-                    })}
-                    error={errorMessage.passwordErrorTranslationKey.length > 0}
-                    helperText={translation(errorMessage.passwordErrorTranslationKey)}
-                />
-                <Button
-                    variant="contained"
-                    style={{background: '#ffa500', margin: '15px'}}
-                    onClick={handleLogin}>
-                    {translation(LOGIN_LOGIN_KEY)}
-                </Button>
-                <Typography display="inline-block">
-                    {translation(LOGIN_NEW_TO_APP_KEY)}
-                </Typography>
-                <Link style={{margin: '15px'}} className={classes.link} onClick={() => navigate("/sign-up")}>
-                    {translation(LOGIN_CREATE_ACCOUNT)}
-                </Link>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(LOGIN_EMAIL_KEY)}
+                        value={credentials.auth}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_AUTH",
+                            newAuth: event.target.value
+                        })}
+                        error={errorMessage.authErrorTranslationKey.length > 0}
+                        helperText={translation(errorMessage.authErrorTranslationKey)}
+                    />
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <TextField
+                        variant='standard'
+                        className={classes.input}
+                        color="warning"
+                        placeholder={translation(LOGIN_PASSWORD_KEY)}
+                        type={
+                            credentials.showPassword ? 'text' :
+                                'password'}
+                        value={credentials.password}
+                        onChange={(event) => dispatchCredentialsState({
+                            type: "CHANGE_PASSWORD",
+                            newPassword: event.target.value
+                        })}
+                        error={errorMessage.passwordErrorTranslationKey.length > 0}
+                        helperText={translation(errorMessage.passwordErrorTranslationKey)}
+                    />
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <Button
+                        type='submit'
+                        variant="contained"
+                        style={{background: '#ffa500', margin: '15px', width:'auto !important'}}
+                        onClick={handleLogin}
+                        >
+                        {translation(LOGIN_LOGIN_KEY)}
+                    </Button>
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <Typography display="inline-block">
+                        {translation(LOGIN_NEW_TO_APP_KEY)}
+                    </Typography>
+                </Grid>
+                <Grid item direction="row" className={classes.innerForm}>
+                    <Link style={{margin: '15px'}} className={classes.link} onClick={() => navigate("/sign-up")}>
+                        {translation(LOGIN_CREATE_ACCOUNT)}
+                    </Link>
+                </Grid>
                 <Snackbar
                     open={snackbarOpen}
                     autoHideDuration={6000}
