@@ -66,7 +66,9 @@ const Synchronisation = () => {
             spacing={0}
             direction="column"
             className={classesStyles.root}>
-            <Grid container xs={3} className={classesStyles.form} direction="column">
+            <Grid container xs={4} className={classesStyles.form} direction="column">
+                <Grid item direction="row" className={classesStyles.innerForm}>
+
                 <ToggleButtonGroup
                     value={apiType}
                     exclusive
@@ -82,8 +84,11 @@ const Synchronisation = () => {
                         <img src={woocommerce_logo} height={"100px"} width={"100px"} alt={"Woocommerce logo"}/>
                     </ToggleButton>
                 </ToggleButtonGroup>
+                </Grid>
+
                 {apiType === ApiType.SHOPIFY && (
-                    <Grid container className={classesStyles.innerForm} direction="column">
+                  <>
+                    <Grid item direction="row" className={classesStyles.innerForm}>
                         <TextField
                             color="warning"
                             placeholder={translation(SYNCHRONIZATION_SHOPIFY_API_TOKEN_PLACEHOLDER_KEY)}
@@ -96,6 +101,8 @@ const Synchronisation = () => {
                             error={errorMessage.apiTokenError.length > 0}
                             helperText={translation(errorMessage.apiTokenError)}
                         ></TextField>
+                    </Grid>
+                    <Grid item direction="row" className={classesStyles.innerForm}>
                         <TextField
                             color="warning"
                             placeholder={translation(SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY)}
@@ -109,9 +116,11 @@ const Synchronisation = () => {
                             helperText={translation(errorMessage.shopDomainShopifyError)}
                         ></TextField>
                     </Grid>
+                  </>
                 )}
                 {apiType === ApiType.WOOCOMMERCE && (
-                    <Grid container className={classesStyles.innerForm} direction="column">
+                  <>
+                    <Grid item className={classesStyles.innerForm} direction="row">
                         <TextField
                             color="warning"
                             placeholder={translation(SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY)}
@@ -124,6 +133,8 @@ const Synchronisation = () => {
                             error={errorMessage.shopDomainWooError.length > 0}
                             helperText={translation(errorMessage.shopDomainWooError)}
                         ></TextField>
+                    </Grid>
+                      <Grid item className={classesStyles.innerForm} direction="row">
                         <TextField
                             color="warning"
                             placeholder={translation(SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_PLACEHOLDER_KEY)}
@@ -136,6 +147,8 @@ const Synchronisation = () => {
                             error={errorMessage.shopConsumerKeyError.length > 0}
                             helperText={translation(errorMessage.shopConsumerKeyError)}
                         ></TextField>
+                      </Grid>
+                      <Grid item className={classesStyles.innerForm} direction="row">
                         <TextField
                             color="warning"
                             placeholder={translation(SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_PLACEHOLDER_KEY)}
@@ -149,6 +162,7 @@ const Synchronisation = () => {
                             helperText={translation(errorMessage.shopConsumerSecretError)}
                         ></TextField>
                     </Grid>
+                    </>
                 )}
                 <Button
                     variant="contained"

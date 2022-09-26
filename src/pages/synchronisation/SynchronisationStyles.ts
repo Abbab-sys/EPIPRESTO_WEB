@@ -22,13 +22,12 @@ export const synchronisationStyles = makeStyles({
     },
     input: {
         margin: '15px !important',
-        width: "87%"
+        width: "100%"
     },
     innerForm: {
         display: 'flex',
         alignItems: "center",
         justifyContent: "center",
         width: "90%",
-        maxWidth: "-webkit-fill-available"
     },
 })
