@@ -7,3 +7,4 @@ export const LOGIN_CREATE_ACCOUNT="login.createAccount";
 export const LOGIN_EMAIL_ERROR_KEY="login.errorMessages.emailError";
 export const LOGIN_PASSWORD_ERROR_KEY="login.errorMessages.passwordError";
 export const LOGIN_CREDENTIALS_ERROR="login.errorMessages.credentialsError";
+export const SERVER_ERROR="server.error";

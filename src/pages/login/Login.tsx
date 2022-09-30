@@ -1,4 +1,4 @@
-import {Alert, Button, Grid, Link, Snackbar, TextField, Typography} from '@mui/material'
+import {Alert, Button, CircularProgress, Grid, Link, Snackbar, TextField, Typography} from '@mui/material'
 import React, {MutableRefObject, useContext, useEffect, useReducer, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.png';
@@ -11,7 +11,8 @@ import {
     LOGIN_CREATE_ACCOUNT,
     LOGIN_CREDENTIALS_ERROR,
     LOGIN_EMAIL_KEY, LOGIN_LOGIN_KEY, LOGIN_NEW_TO_APP_KEY,
-    LOGIN_PASSWORD_KEY
+    LOGIN_PASSWORD_KEY,
+    SERVER_ERROR
 } from "../../translations/keys/LoginTranslationKeys";
 
 import {
@@ -36,8 +37,38 @@ const Login = () => {
         = useReducer(loginCredentialsReducer, initialLoginCredentialsStateReducer);
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
-    const [loginByEmail] = useLazyQuery(LOGIN_BY_EMAIL);
-    const [loginByUsername] = useLazyQuery(LOGIN_BY_USERNAME);
+    const [loginByEmail, { loading: emailAuthLoading, error: emailAuthError, data: emailAuthData }] = useLazyQuery(LOGIN_BY_EMAIL);
+    const [loginByUsername, { loading: usernameAuthLoading, error: usernameAuthError, data: usernameAuthData }] = useLazyQuery(LOGIN_BY_USERNAME);
+
+    useEffect(() => {
+        console.log(emailAuthLoading)
+        console.log(emailAuthError)
+        console.log(emailAuthData)
+        if (emailAuthLoading || emailAuthError || !emailAuthData|| !emailAuthData.loginVendorByEmail !== null) return
+        const serverResponse = emailAuthData.loginVendorByEmail
+        const loggedWithSuccess = serverResponse.code === 200
+        if (loggedWithSuccess) {
+            setStoreId(serverResponse.vendorAccount.store._id)
+            console.log("SUCCESS EMAIL")
+        } else {
+            setSnackbarOpen(true)
+        }
+    }, [emailAuthLoading, emailAuthError, emailAuthData])
+
+    useEffect(() => {
+        console.log(usernameAuthLoading)
+        console.log(usernameAuthError)
+        console.log(usernameAuthData)
+        if (usernameAuthLoading || usernameAuthError || !usernameAuthData || !usernameAuthData.loginVendorByUsername) return
+        const serverResponse = usernameAuthData.loginVendorByUsername
+        const loggedWithSuccess = serverResponse.code === 200
+        if (loggedWithSuccess) {
+            setStoreId(serverResponse.vendorAccount.store._id)
+            console.log("SUCCESS USERNAME")
+        } else {
+            setSnackbarOpen(true)
+        }
+    }, [usernameAuthLoading, usernameAuthError, usernameAuthData])
 
     useEffect(() => {
         document.onkeydown = (event) => {
@@ -56,24 +87,15 @@ const Login = () => {
         return credsState.credentials.auth.length > 0 && credsState.credentials.password.length > 0
     }
 
-    const handleLogin = async () => {
+    const handleLogin = () => {
         dispatchCredentialsState({type: 'CHECK_LOGIN_CREDENTIALS'})
         const areCredentialsValid = areAllCredentialsFieldsValid({credentials, errorMessage})
 
         if (areCredentialsValid) {
             const isAuthEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(credentials.auth)
-            const loginResponse = isAuthEmail
-                ? await loginByEmail({variables: {email: credentials.auth, password: credentials.password}})
-                : await loginByUsername({variables: {username: credentials.auth, password: credentials.password}})
-
-            const serverResponse= (isAuthEmail)? loginResponse.data.loginVendorByEmail : loginResponse.data.loginVendorByUsername
-            const loggedWithSuccess =serverResponse.code
-
-            if (loggedWithSuccess) {
-                setStoreId(serverResponse.vendorAccount.store._id)
-            } else {
-                setSnackbarOpen(true)
-            }
+            isAuthEmail
+        			? loginByEmail({variables: {email: credentials.auth, password: credentials.password}})
+              : loginByUsername({variables: {username: credentials.auth, password: credentials.password}})
         }
     }
 
@@ -120,14 +142,16 @@ const Login = () => {
                     />
                 </Grid>
                 <Grid item direction="row" className={classes.innerForm}>
-                    <Button
+                    {emailAuthLoading || usernameAuthLoading ? <CircularProgress></CircularProgress>
+                        : (<Button
                         type='submit'
                         variant="contained"
                         style={{background: '#ffa500', margin: '15px', width:'auto !important'}}
                         onClick={handleLogin}
                         >
                         {translation(LOGIN_LOGIN_KEY)}
-                    </Button>
+                    </Button>)
+                    }  
                 </Grid>
                 <Grid item direction="row" className={classes.innerForm}>
                     <Typography display="inline-block">
@@ -144,7 +168,7 @@ const Login = () => {
                     autoHideDuration={6000}
                     onClose={handleSnackbarClosing}>
                     <Alert onClose={handleSnackbarClosing} severity="error" sx={{width: '100%'}}>
-                        {translation(LOGIN_CREDENTIALS_ERROR)}
+                        {emailAuthError || usernameAuthError ? translation(SERVER_ERROR) : translation(LOGIN_CREDENTIALS_ERROR)}
                     </Alert>
                 </Snackbar>
             </Grid>

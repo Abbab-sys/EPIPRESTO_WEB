@@ -4,6 +4,9 @@
     "fr": "Français",
     "language": "Langue"
   },
+  "server": {
+    "error": "Oops une erreur est survenue"
+  },
   "login":{
     "email": "Email ou Pseudonyme",
     "password": "Mot de passe",
@@ -19,7 +22,7 @@
   "sign_up": {
     "createAccount": "Créer un compte",
     "successAccountCreation": "Votre compte a été créé aves succès!",
-    "errorAccountCreation": "Oops une erreur est survenues",
+    "errorAccountCreation": "Oops une erreur est survenue",
     "shopName": {
       "placeholder": "Nom du marché",
       "errorMessage": "Le champ du nom du marché ne peut pas être vide"
@@ -62,7 +65,7 @@
     "error": "Un des champs renseignés est incorrect",
     "domainName": {
       "placeholder": "Nom de domaine",
-      "errorMessage" :"Le nom du domaine ne peut pas être vide"
+      "errorMessage" : "Le nom du domaine ne peut pas être vide"
     },
     "shopify": {
       "apiToken": {

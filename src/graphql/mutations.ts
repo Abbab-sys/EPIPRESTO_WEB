@@ -5,6 +5,12 @@ export const SIGN_UP = gql`
     vendorSignUp(accountInput: $accountInput) {
       code
       message
+      vendorAccount {
+        _id
+        store {
+          _id
+        }
+      }
     }
   }
 `

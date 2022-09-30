@@ -4,6 +4,9 @@
     "fr": "French",
     "language": "Language"
   },
+  "server": {
+    "error": "Oops something went wrong"
+  },
   "login": {
     "email": "Email or Username",
     "password": "Password",
@@ -66,7 +69,7 @@
     },
     "shopify": {
       "apiToken": {
-        "placeholder" : "API Token",
+        "placeholder": "API Token",
         "errorMessage": "The API Token can not be empty"
       }
     },
