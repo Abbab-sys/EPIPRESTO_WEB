@@ -1,4 +1,4 @@
-import {Alert, Button, CircularProgress, Grid, TextField} from '@mui/material'
+import {Alert, Button, Grid, TextField} from '@mui/material'
 import React, {useContext, useEffect, useReducer, useState} from 'react';
 import logo from '../../assets/logo.png';
 import {useLazyQuery, useMutation} from '@apollo/client'
@@ -24,90 +24,78 @@ import {
 
   SIGN_UP_USERNAME_PLACEHOLDER_KEY
 } from "../../translations/keys/SignUpTranslationKeys";
-import { VendorContext } from '../../context/Vendor';
-
+import {VendorContext} from '../../context/Vendor';
 
 const SignUp = () => {
+  document.onkeydown = (event) => {
+    if (event.key === "Enter") handleCreateAccount()
+  }
+
   const {t: translation} = useTranslation('translation')
   const classes = signUpStyles()
   const navigate = useNavigate()
+
   const {setStoreId} = useContext(VendorContext);
 
   const [{verifyPassword, accountInput, signUpErrorMessage}, dispatchCredentialsState]
     = useReducer(signUpCredentialsReducer, initialSignUpCredentialsState);
 
+  useEffect(() => {
+    dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
+  }, [])
   const [errorOpen, setErrorOpen] = useState(false);
 
-  const [isEmailUsed, {loading: emailUsedLoading, error: emailUsedError, data: emailUsedData}] = useLazyQuery(IS_VENDOR_EMAIL_USED);
-  const [isUsernameUsed, {loading: usernameUsedLoading, error: usernameUsedError, data: usernameUsedData}] = useLazyQuery(IS_VENDOR_USERNAME_USED);
-  const [signUp, {loading: signUpLoading, error: signUpError, data: signUpData}] = useMutation(SIGN_UP);
-
-  const [emailCheckingTimeout, setEmailCheckingTimeout] = useState(setTimeout(() => isEmailUsed({variables: {email: accountInput.email}}), 500))
-  useEffect(() => {
-    isEmailUsed({variables: {email: accountInput.email}})
-    clearTimeout(emailCheckingTimeout)
-    setEmailCheckingTimeout(setTimeout(() => {
-      isEmailUsed({variables: {email: accountInput.email}})
-    }, 500))
-  }, [accountInput.email])
-
-  const [usernameCheckingTimeout, setUsernameCheckingTimeout] = useState(setTimeout(() => isUsernameUsed({variables: {username: accountInput.username}}), 500))
-  useEffect(() => {
-    clearTimeout(usernameCheckingTimeout)
-    setUsernameCheckingTimeout(setTimeout(() => {
-      isUsernameUsed({variables: {username: accountInput.username}})
-    }, 500))
-    
-  }, [accountInput.username])
+  const [isEmailUsed, {
+    loading: emailUsedLoading,
+    data: emailUsedData
+  }] = useLazyQuery(IS_VENDOR_EMAIL_USED);
+  const [isUsernameUsed, {
+    loading: usernameUsedLoading,
+    data: usernameUsedData
+  }] = useLazyQuery(IS_VENDOR_USERNAME_USED);
+  const [signUp, {data: signUpData}] = useMutation(SIGN_UP);
 
   useEffect(() => {
-    if (emailUsedData && emailUsedData.isVendorEmailUsed) {
-      setDisabled(true)
-      dispatchCredentialsState({
-        type: "SET_EMAIL_AS_ALREADY_USED",
-      })
-    } else {
-      setDisabled(
-        signUpErrorMessage.emailError.length > 0 ||
-        signUpErrorMessage.usernameError.length > 0 ||
-        emailUsedLoading ||
-        usernameUsedLoading ||
-        !areAllCredentialsFieldsValid()
-      )
-      dispatchCredentialsState({
-        type: "SET_EMAIL_AS_UNUSED",
-      })
-    }
-  }, [emailUsedLoading, emailUsedError, emailUsedData])
+    const timeout = setTimeout(() => {
+      isEmailUsed({variables: {email: accountInput.email}}).then(r => console.log(r))
+    }, 500)
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [accountInput.email, isEmailUsed])
 
   useEffect(() => {
-    if (usernameUsedData && usernameUsedData.isVendorUsernameUsed) {
-      setDisabled(true)
-      dispatchCredentialsState({
-        type: "SET_USERNAME_AS_ALREADY_USED",
-      })
-    } else {
-      setDisabled(
-        signUpErrorMessage.emailError.length > 0 ||
-        signUpErrorMessage.usernameError.length > 0 ||
-        emailUsedLoading ||
-        usernameUsedLoading ||
-        !areAllCredentialsFieldsValid()
-      )
-      dispatchCredentialsState({
-        type: "SET_USERNAME_AS_UNUSED",
-      })
-    }
-  }, [usernameUsedLoading, usernameUsedError, usernameUsedData])
+    if (!emailUsedData) return
+    (emailUsedData.isVendorEmailUsed)
+      ? dispatchCredentialsState({type: "SET_EMAIL_AS_ALREADY_USED"})
+      : dispatchCredentialsState({type: "SET_EMAIL_AS_UNUSED"})
+  }, [emailUsedData])
+
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      isUsernameUsed({variables: {username: accountInput.username}}).then(r => console.log(r))
+    }, 500)
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [accountInput.username, isUsernameUsed])
+  useEffect(() => {
+    if (!usernameUsedData) return
+    (usernameUsedData.isVendorUsernameUsed)
+      ? dispatchCredentialsState({type: "SET_USERNAME_AS_ALREADY_USED"})
+      : dispatchCredentialsState({type: "SET_USERNAME_AS_UNUSED"})
+  }, [usernameUsedData])
+
 
   useEffect(() => {
     if (signUpData && signUpData.vendorSignUp.code === 200) {
-      setStoreId(signUpData.data.vendorSignUp.vendorAccount.store._id)
+      setStoreId(signUpData.vendorSignUp.vendorAccount.store._id)
       navigate("/synchronization")
     } else {
       setErrorOpen(true)
     }
-  }, [signUpLoading, signUpError, signUpData])
+  }, [navigate, setStoreId, signUpData])
 
   const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -116,38 +104,34 @@ const SignUp = () => {
     setErrorOpen(false);
   };
 
-  function areAllCredentialsFieldsValid(): boolean {
+  const areAllCredentialsFieldsValid = (): boolean => {
     const currErrorMessages = signUpErrorMessage;
-    return currErrorMessages.emailError === '' ||
-      currErrorMessages.usernameError === '' ||
-      currErrorMessages.passwordError === '' ||
-      currErrorMessages.verifyPasswordError === '' ||
-      currErrorMessages.shopNameError === '' ||
-      currErrorMessages.addressError === '' ||
+    return currErrorMessages.emailError === '' &&
+      currErrorMessages.usernameError === '' &&
+      currErrorMessages.passwordError === '' &&
+      currErrorMessages.verifyPasswordError === '' &&
+      currErrorMessages.shopNameError === '' &&
+      currErrorMessages.addressError === '' &&
       currErrorMessages.phoneError === '';
+  }
+
+  const submitButtonShouldBeDisabled = () => {
+    return signUpErrorMessage.emailError.length > 0 ||
+      signUpErrorMessage.usernameError.length > 0 ||
+      emailUsedLoading ||
+      usernameUsedLoading ||
+      !areAllCredentialsFieldsValid() ||
+      emailUsedLoading ||
+      usernameUsedLoading
   }
 
   const handleCreateAccount = () => {
     dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
     const areCredentialsValid = areAllCredentialsFieldsValid()
     if (areCredentialsValid) {
-      signUp({variables: {accountInput: accountInput}})
+      signUp({variables: {accountInput: accountInput}}).then(r => console.log(r))
     }
   }
-
-  useEffect(() => {
-    document.onkeydown = (event) => {
-        if(event.key === "Enter") handleCreateAccount()
-    }
-  },);
-
-  const [disabled, setDisabled] = useState(
-    signUpErrorMessage.emailError.length > 0 ||
-    signUpErrorMessage.usernameError.length > 0 ||
-    emailUsedLoading ||
-    usernameUsedLoading ||
-    !areAllCredentialsFieldsValid()
-  )
 
   return (
     <Grid
@@ -172,7 +156,7 @@ const SignUp = () => {
               newShopName: event.target.value
             })}
             error={signUpErrorMessage.shopNameError.length > 0}
-            helperText={translation(signUpErrorMessage.shopNameError)}
+            helperText={signUpErrorMessage.shopNameError.length > 0 ? translation(signUpErrorMessage.shopNameError) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -187,7 +171,7 @@ const SignUp = () => {
               newUsername: event.target.value
             })}
             error={signUpErrorMessage.usernameError.length > 0}
-            helperText={translation(signUpErrorMessage.usernameError)}
+            helperText={(signUpErrorMessage.usernameError.length > 0) ? translation(signUpErrorMessage.usernameError) : ""}
           />
           <TextField
             variant='standard'
@@ -200,7 +184,7 @@ const SignUp = () => {
               newAddress: event.target.value
             })}
             error={signUpErrorMessage.addressError.length > 0}
-            helperText={translation(signUpErrorMessage.addressError)}
+            helperText={signUpErrorMessage.addressError.length > 0 ? translation(signUpErrorMessage.addressError) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -216,7 +200,7 @@ const SignUp = () => {
             })
             }
             error={signUpErrorMessage.emailError.length > 0}
-            helperText={translation(signUpErrorMessage.emailError)}
+            helperText={signUpErrorMessage.emailError.length > 0 ? translation(signUpErrorMessage.emailError) : ""}
           />
           <TextField
             variant='standard'
@@ -229,7 +213,7 @@ const SignUp = () => {
               newPhone: event.target.value
             })}
             error={signUpErrorMessage.phoneError.length > 0}
-            helperText={translation(signUpErrorMessage.phoneError)}
+            helperText={signUpErrorMessage.phoneError.length > 0 ? translation(signUpErrorMessage.phoneError) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -245,7 +229,7 @@ const SignUp = () => {
               newPassword: event.target.value
             })}
             error={signUpErrorMessage.passwordError.length > 0}
-            helperText={translation(signUpErrorMessage.passwordError)}
+            helperText={signUpErrorMessage.passwordError.length > 0 ? translation(signUpErrorMessage.passwordError) : ""}
           />
           <TextField
             variant='standard'
@@ -259,15 +243,15 @@ const SignUp = () => {
               newConfirmPassword: event.target.value
             })}
             error={signUpErrorMessage.verifyPasswordError.length > 0}
-            helperText={translation(signUpErrorMessage.verifyPasswordError)}
+            helperText={signUpErrorMessage.verifyPasswordError.length > 0 ? translation(signUpErrorMessage.verifyPasswordError) : ""}
           />
-        </Grid>    
+        </Grid>
         <Button
           variant="contained"
           style={{background: '#ffa500', margin: '15px'}}
           onClick={handleCreateAccount}
-          disabled={disabled}
-          >
+          disabled={submitButtonShouldBeDisabled()}
+        >
           {translation(SIGN_UP_CREATE_ACCOUNT_KEY)}
         </Button>
         <Snackbar

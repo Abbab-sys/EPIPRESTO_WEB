@@ -1,5 +1,5 @@
 import {Alert, Button, CircularProgress, Grid, Link, Snackbar, TextField, Typography} from '@mui/material'
-import React, {MutableRefObject, useContext, useEffect, useReducer, useRef, useState} from 'react';
+import React, {useContext, useEffect, useReducer, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import {useLazyQuery} from '@apollo/client/react';
@@ -23,6 +23,9 @@ import {loginCredentialsReducer} from "./reducers/LoginCredentialsReducer";
 
 
 const Login = () => {
+    document.onkeydown = (event) => {
+        if(event.key === "Enter") handleLogin()
+    }
     const {t: translation} = useTranslation('translation')
     const classes = loginStyles()
     const navigate = useNavigate()
@@ -41,40 +44,26 @@ const Login = () => {
     const [loginByUsername, { loading: usernameAuthLoading, error: usernameAuthError, data: usernameAuthData }] = useLazyQuery(LOGIN_BY_USERNAME);
 
     useEffect(() => {
-        console.log(emailAuthLoading)
-        console.log(emailAuthError)
-        console.log(emailAuthData)
         if (emailAuthLoading || emailAuthError || !emailAuthData|| !emailAuthData.loginVendorByEmail !== null) return
         const serverResponse = emailAuthData.loginVendorByEmail
         const loggedWithSuccess = serverResponse.code === 200
         if (loggedWithSuccess) {
             setStoreId(serverResponse.vendorAccount.store._id)
-            console.log("SUCCESS EMAIL")
         } else {
             setSnackbarOpen(true)
         }
-    }, [emailAuthLoading, emailAuthError, emailAuthData])
+    }, [emailAuthLoading, emailAuthError, emailAuthData, setStoreId])
 
     useEffect(() => {
-        console.log(usernameAuthLoading)
-        console.log(usernameAuthError)
-        console.log(usernameAuthData)
         if (usernameAuthLoading || usernameAuthError || !usernameAuthData || !usernameAuthData.loginVendorByUsername) return
         const serverResponse = usernameAuthData.loginVendorByUsername
         const loggedWithSuccess = serverResponse.code === 200
         if (loggedWithSuccess) {
             setStoreId(serverResponse.vendorAccount.store._id)
-            console.log("SUCCESS USERNAME")
         } else {
             setSnackbarOpen(true)
         }
-    }, [usernameAuthLoading, usernameAuthError, usernameAuthData])
-
-    useEffect(() => {
-        document.onkeydown = (event) => {
-            if(event.key === "Enter") handleLogin()
-        }
-    },);
+    }, [usernameAuthLoading, usernameAuthError, usernameAuthData, setStoreId])
 
     const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
@@ -120,7 +109,7 @@ const Login = () => {
                             newAuth: event.target.value
                         })}
                         error={errorMessage.authErrorTranslationKey.length > 0}
-                        helperText={translation(errorMessage.authErrorTranslationKey)}
+                        helperText={errorMessage.authErrorTranslationKey.length > 0?translation(errorMessage.authErrorTranslationKey):""}
                     />
                 </Grid>
                 <Grid item direction="row" className={classes.innerForm}>
@@ -138,7 +127,7 @@ const Login = () => {
                             newPassword: event.target.value
                         })}
                         error={errorMessage.passwordErrorTranslationKey.length > 0}
-                        helperText={translation(errorMessage.passwordErrorTranslationKey)}
+                        helperText={errorMessage.passwordErrorTranslationKey.length > 0?translation(errorMessage.passwordErrorTranslationKey):""}
                     />
                 </Grid>
                 <Grid item direction="row" className={classes.innerForm}>
@@ -151,7 +140,7 @@ const Login = () => {
                         >
                         {translation(LOGIN_LOGIN_KEY)}
                     </Button>)
-                    }  
+                    }
                 </Grid>
                 <Grid item direction="row" className={classes.innerForm}>
                     <Typography display="inline-block">
