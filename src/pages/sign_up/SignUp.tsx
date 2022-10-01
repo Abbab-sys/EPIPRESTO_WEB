@@ -42,7 +42,7 @@ const SignUp = () => {
 
   useEffect(() => {
     dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
-  }, [])
+  }, [accountInput.shopName ,accountInput.username,accountInput.email, accountInput.password , verifyPassword ,accountInput.phone , accountInput.address]);
   const [errorOpen, setErrorOpen] = useState(false);
 
   const [isEmailUsed, {
@@ -106,23 +106,19 @@ const SignUp = () => {
 
   const areAllCredentialsFieldsValid = (): boolean => {
     const currErrorMessages = signUpErrorMessage;
-    return currErrorMessages.emailError === '' &&
-      currErrorMessages.usernameError === '' &&
-      currErrorMessages.passwordError === '' &&
-      currErrorMessages.verifyPasswordError === '' &&
-      currErrorMessages.shopNameError === '' &&
-      currErrorMessages.addressError === '' &&
-      currErrorMessages.phoneError === '';
+    return currErrorMessages.emailError.size === 0 &&
+      currErrorMessages.usernameError.size === 0 &&
+      currErrorMessages.passwordError.size === 0 &&
+      currErrorMessages.verifyPasswordError.size === 0 &&
+      currErrorMessages.shopNameError.size === 0 &&
+      currErrorMessages.addressError.size === 0 &&
+      currErrorMessages.phoneError.size === 0;
   }
 
   const submitButtonShouldBeDisabled = () => {
-    return signUpErrorMessage.emailError.length > 0 ||
-      signUpErrorMessage.usernameError.length > 0 ||
-      emailUsedLoading ||
+    return emailUsedLoading ||
       usernameUsedLoading ||
-      !areAllCredentialsFieldsValid() ||
-      emailUsedLoading ||
-      usernameUsedLoading
+      !areAllCredentialsFieldsValid()
   }
 
   const handleCreateAccount = () => {
@@ -155,8 +151,8 @@ const SignUp = () => {
               type: "CHANGE_SHOP_NAME",
               newShopName: event.target.value
             })}
-            error={signUpErrorMessage.shopNameError.length > 0}
-            helperText={signUpErrorMessage.shopNameError.length > 0 ? translation(signUpErrorMessage.shopNameError) : ""}
+            error={signUpErrorMessage.shopNameError.size > 0}
+            helperText={signUpErrorMessage.shopNameError.size > 0 ? translation(signUpErrorMessage.shopNameError.values().next().value) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -170,8 +166,8 @@ const SignUp = () => {
               type: "CHANGE_USERNAME",
               newUsername: event.target.value
             })}
-            error={signUpErrorMessage.usernameError.length > 0}
-            helperText={(signUpErrorMessage.usernameError.length > 0) ? translation(signUpErrorMessage.usernameError) : ""}
+            error={signUpErrorMessage.usernameError.size > 0}
+            helperText={(signUpErrorMessage.usernameError.size > 0) ? translation(signUpErrorMessage.usernameError.values().next().value) : ""}
           />
           <TextField
             variant='standard'
@@ -183,8 +179,8 @@ const SignUp = () => {
               type: "CHANGE_ADDRESS",
               newAddress: event.target.value
             })}
-            error={signUpErrorMessage.addressError.length > 0}
-            helperText={signUpErrorMessage.addressError.length > 0 ? translation(signUpErrorMessage.addressError) : ""}
+            error={signUpErrorMessage.addressError.size > 0}
+            helperText={signUpErrorMessage.addressError.size > 0 ? translation(signUpErrorMessage.addressError.values().next().value) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -199,8 +195,8 @@ const SignUp = () => {
               newEmail: event.target.value
             })
             }
-            error={signUpErrorMessage.emailError.length > 0}
-            helperText={signUpErrorMessage.emailError.length > 0 ? translation(signUpErrorMessage.emailError) : ""}
+            error={signUpErrorMessage.emailError.size > 0}
+            helperText={signUpErrorMessage.emailError.size > 0 ? translation(signUpErrorMessage.emailError.values().next().value) : ""}
           />
           <TextField
             variant='standard'
@@ -212,8 +208,8 @@ const SignUp = () => {
               type: "CHANGE_PHONE",
               newPhone: event.target.value
             })}
-            error={signUpErrorMessage.phoneError.length > 0}
-            helperText={signUpErrorMessage.phoneError.length > 0 ? translation(signUpErrorMessage.phoneError) : ""}
+            error={signUpErrorMessage.phoneError.size > 0}
+            helperText={signUpErrorMessage.phoneError.size > 0 ? translation(signUpErrorMessage.phoneError.values().next().value) : ""}
           />
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
@@ -228,8 +224,8 @@ const SignUp = () => {
               type: "CHANGE_PASSWORD",
               newPassword: event.target.value
             })}
-            error={signUpErrorMessage.passwordError.length > 0}
-            helperText={signUpErrorMessage.passwordError.length > 0 ? translation(signUpErrorMessage.passwordError) : ""}
+            error={signUpErrorMessage.passwordError.size > 0}
+            helperText={signUpErrorMessage.passwordError.size > 0 ? translation(signUpErrorMessage.passwordError.values().next().value) : ""}
           />
           <TextField
             variant='standard'
@@ -242,8 +238,8 @@ const SignUp = () => {
               type: "CHANGE_CONFIRM_PASSWORD",
               newConfirmPassword: event.target.value
             })}
-            error={signUpErrorMessage.verifyPasswordError.length > 0}
-            helperText={signUpErrorMessage.verifyPasswordError.length > 0 ? translation(signUpErrorMessage.verifyPasswordError) : ""}
+            error={signUpErrorMessage.verifyPasswordError.size > 0}
+            helperText={signUpErrorMessage.verifyPasswordError.size > 0 ? translation(signUpErrorMessage.verifyPasswordError.values().next().value) : ""}
           />
         </Grid>
         <Button

@@ -11,4 +11,3 @@ export type SignUpCredentialsReducerActions =
     | { type: 'SET_EMAIL_AS_ALREADY_USED'}
     | { type: 'SET_USERNAME_AS_UNUSED'}
     | { type: 'SET_EMAIL_AS_UNUSED'}
-

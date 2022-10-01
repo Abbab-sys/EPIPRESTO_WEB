@@ -1,29 +1,22 @@
-import {AccountInput, SignUpErrorMessage} from "../../../interfaces/SignUpInterfaces";
+import {AccountInput, initialSignUpErrorMessage, SignUpErrorMessage} from "../../../interfaces/SignUpInterfaces";
 
 export interface SignUpCredentialsReducerState {
-    verifyPassword: string;
-    accountInput: AccountInput;
-    signUpErrorMessage: SignUpErrorMessage
+  verifyPassword: string;
+  accountInput: AccountInput;
+  signUpErrorMessage: SignUpErrorMessage
 }
 
-
 export const initialSignUpCredentialsState: SignUpCredentialsReducerState = {
-    verifyPassword: '',
-    accountInput: {
-        shopName: '',
-        email: '',
-        address: '',
-        phone: '',
-        username: '',
-        password: ''
-    },
-    signUpErrorMessage: {
-        shopNameError: '',
-        emailError: '',
-        addressError: '',
-        phoneError: '',
-        usernameError: '',
-        passwordError: '',
-        verifyPasswordError: ''
-    }
+  verifyPassword: '',
+  accountInput: {
+    shopName: '',
+    email: '',
+    address: '',
+    phone: '',
+    username: '',
+    password: ''
+  },
+  signUpErrorMessage: {
+    ...initialSignUpErrorMessage
+  }
 }

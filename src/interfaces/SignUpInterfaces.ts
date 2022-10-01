@@ -8,20 +8,20 @@ export interface AccountInput {
 }
 
 export interface SignUpErrorMessage {
-    shopNameError: string;
-    emailError: string;
-    addressError: string;
-    phoneError: string;
-    usernameError: string;
-    passwordError: string;
-    verifyPasswordError: string;
+    shopNameError: Set<string>;
+    emailError: Set<string>;
+    addressError: Set<string>;
+    phoneError: Set<string>;
+    usernameError: Set<string>;
+    passwordError: Set<string>;
+    verifyPasswordError: Set<string>;
 }
 export const initialSignUpErrorMessage: SignUpErrorMessage = {
-    shopNameError: '',
-    emailError: '',
-    addressError: '',
-    phoneError: '',
-    usernameError: '',
-    passwordError: '',
-    verifyPasswordError: ''
+    shopNameError: new Set(),
+    emailError: new Set(),
+    addressError: new Set(),
+    phoneError: new Set(),
+    usernameError: new Set(),
+    passwordError: new Set(),
+    verifyPasswordError: new Set()
 }
