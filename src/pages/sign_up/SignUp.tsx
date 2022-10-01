@@ -25,11 +25,9 @@ import {
   SIGN_UP_USERNAME_PLACEHOLDER_KEY
 } from "../../translations/keys/SignUpTranslationKeys";
 import {VendorContext} from '../../context/Vendor';
+import {useTimeout} from "../../hooks/CredentialsHooks";
 
 const SignUp = () => {
-  document.onkeydown = (event) => {
-    if (event.key === "Enter") handleCreateAccount()
-  }
 
   const {t: translation} = useTranslation('translation')
   const classes = signUpStyles()
@@ -40,30 +38,21 @@ const SignUp = () => {
   const [{verifyPassword, accountInput, signUpErrorMessage}, dispatchCredentialsState]
     = useReducer(signUpCredentialsReducer, initialSignUpCredentialsState);
 
-  useEffect(() => {
-    dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
-  }, [accountInput.shopName ,accountInput.username,accountInput.email, accountInput.password , verifyPassword ,accountInput.phone , accountInput.address]);
   const [errorOpen, setErrorOpen] = useState(false);
 
-  const [isEmailUsed, {
-    loading: emailUsedLoading,
-    data: emailUsedData
-  }] = useLazyQuery(IS_VENDOR_EMAIL_USED);
+  const [isEmailUsed, {loading: emailUsedLoading, data: emailUsedData}] = useLazyQuery(IS_VENDOR_EMAIL_USED);
   const [isUsernameUsed, {
     loading: usernameUsedLoading,
     data: usernameUsedData
   }] = useLazyQuery(IS_VENDOR_USERNAME_USED);
   const [signUp, {data: signUpData}] = useMutation(SIGN_UP);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      isEmailUsed({variables: {email: accountInput.email}}).then(r => console.log(r))
-    }, 500)
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [accountInput.email, isEmailUsed])
-
+  useTimeout({
+    callback: isEmailUsed,
+    time: 500,
+    callbackVars: {variables: {email: accountInput.email}},
+    dependencies: [accountInput.email]
+  })
   useEffect(() => {
     if (!emailUsedData) return
     (emailUsedData.isVendorEmailUsed)
@@ -72,14 +61,12 @@ const SignUp = () => {
   }, [emailUsedData])
 
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      isUsernameUsed({variables: {username: accountInput.username}}).then(r => console.log(r))
-    }, 500)
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [accountInput.username, isUsernameUsed])
+  useTimeout({
+    callback: isUsernameUsed,
+    time: 500,
+    callbackVars: {variables: {username: accountInput.username}},
+    dependencies: [accountInput.username]
+  })
   useEffect(() => {
     if (!usernameUsedData) return
     (usernameUsedData.isVendorUsernameUsed)
@@ -89,7 +76,8 @@ const SignUp = () => {
 
 
   useEffect(() => {
-    if (signUpData && signUpData.vendorSignUp.code === 200) {
+    if (!signUpData) return
+    if (signUpData.vendorSignUp.code === 200) {
       setStoreId(signUpData.vendorSignUp.vendorAccount.store._id)
       navigate("/synchronization")
     } else {
@@ -114,11 +102,21 @@ const SignUp = () => {
       currErrorMessages.addressError.size === 0 &&
       currErrorMessages.phoneError.size === 0;
   }
+  const areAllCredentialsFieldsAreFilled = (): boolean => {
+    return accountInput.shopName !== '' &&
+      accountInput.email !== '' &&
+      accountInput.username !== '' &&
+      accountInput.password !== '' &&
+      verifyPassword !== '' &&
+      accountInput.address !== '' &&
+      accountInput.phone !== ''
+  }
 
   const submitButtonShouldBeDisabled = () => {
     return emailUsedLoading ||
       usernameUsedLoading ||
       !areAllCredentialsFieldsValid()
+      || !areAllCredentialsFieldsAreFilled()
   }
 
   const handleCreateAccount = () => {
@@ -126,9 +124,13 @@ const SignUp = () => {
     const areCredentialsValid = areAllCredentialsFieldsValid()
     if (areCredentialsValid) {
       signUp({variables: {accountInput: accountInput}}).then(r => console.log(r))
+    } else {
+      dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
     }
   }
-
+  document.onkeydown = (event) => {
+    if (event.key === "Enter" && !submitButtonShouldBeDisabled()) handleCreateAccount()
+  }
   return (
     <Grid
       container

@@ -14,7 +14,9 @@ import {
 
 export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, action: SignUpCredentialsReducerActions): SignUpCredentialsReducerState {
   switch (action.type) {
-    case 'CHANGE_SHOP_NAME':
+    case 'CHANGE_SHOP_NAME': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.shopNameError, SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY, action.newShopName === '')
       return {
         ...state,
         accountInput: {
@@ -23,10 +25,15 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          shopNameError: new Set()
+          shopNameError: errorMessage.shopNameError
         }
       }
-    case 'CHANGE_EMAIL':
+    }
+    case 'CHANGE_EMAIL': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      const emailFormatIsInvalid = !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(action.newEmail)
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY, emailFormatIsInvalid)
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_EMPTY_KEY, action.newEmail === '')
       return {
         ...state,
         accountInput: {
@@ -35,10 +42,13 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          emailError: new Set()
+          emailError: errorMessage.emailError
         }
       }
-    case 'CHANGE_ADDRESS':
+    }
+    case 'CHANGE_ADDRESS': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.addressError, SIGN_UP_ADRESS_ERROR_MESSAGE_KEY, action.newAddress === '')
       return {
         ...state,
         accountInput: {
@@ -47,10 +57,13 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          addressError: new Set()
+          addressError: errorMessage.addressError
         }
       }
-    case 'CHANGE_PHONE':
+    }
+    case 'CHANGE_PHONE': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.phoneError, SIGN_UP_PHONE_ERROR_MESSAGE_KEY, action.newPhone === '')
       return {
         ...state,
         accountInput: {
@@ -59,10 +72,13 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          phoneError: new Set()
+          phoneError: errorMessage.phoneError
         }
       }
-    case 'CHANGE_USERNAME':
+    }
+    case 'CHANGE_USERNAME': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.usernameError, SIGN_UP_USERNAME_ERROR_EMPTY_KEY, action.newUsername === '')
       return {
         ...state,
         accountInput: {
@@ -71,10 +87,14 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          usernameError: new Set()
+          usernameError: errorMessage.usernameError
         }
       }
-    case 'CHANGE_PASSWORD':
+    }
+    case 'CHANGE_PASSWORD': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.passwordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, action.newPassword === '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY, state.verifyPassword !== action.newPassword)
       return {
         ...state,
         accountInput: {
@@ -83,70 +103,120 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         },
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          passwordError: new Set()
+          passwordError: errorMessage.passwordError
         }
       }
-    case 'CHANGE_CONFIRM_PASSWORD':
+    }
+    case 'CHANGE_CONFIRM_PASSWORD': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, action.newConfirmPassword=== '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password !== action.newConfirmPassword)
       return {
         ...state,
         verifyPassword: action.newConfirmPassword,
         signUpErrorMessage: {
           ...state.signUpErrorMessage,
-          verifyPasswordError: new Set()
+          verifyPasswordError: errorMessage.verifyPasswordError
         }
       }
-    case 'CHECK_SIGN_UP_CREDENTIALS':
+    }
+    case 'CHECK_SIGN_UP_CREDENTIALS': {
       const errorMessage = {...initialSignUpErrorMessage}
       const emailFormatIsInvalid = !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(state.accountInput.email)
-      if (state.accountInput.shopName === '') {
-        errorMessage.shopNameError.add(SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY)
-      } else {
-        errorMessage.shopNameError.delete(SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY)
-      }
-      if (state.accountInput.email === '') {
-        errorMessage.emailError.add(SIGN_UP_EMAIL_ERROR_EMPTY_KEY)
-      } else {
-        errorMessage.emailError.delete(SIGN_UP_EMAIL_ERROR_EMPTY_KEY)
-      }
-      if (emailFormatIsInvalid) {
-        errorMessage.emailError.add(SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY)
-      } else {
-        errorMessage.emailError.delete(SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY)
-      }
-      if (state.accountInput.username === '') {
-        errorMessage.usernameError.add(SIGN_UP_USERNAME_ERROR_EMPTY_KEY)
-      }
-      else{
-        errorMessage.usernameError.delete(SIGN_UP_USERNAME_ERROR_EMPTY_KEY)
-      }
-      if (state.accountInput.password === '') {
-        errorMessage.passwordError.add(SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY)
-      }
-      else{
-        errorMessage.passwordError.delete(SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY)
-      }
-      if (state.accountInput.password !== state.verifyPassword) {
-        errorMessage.verifyPasswordError.add(SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY)
-      }
-      else{
-        errorMessage.verifyPasswordError.delete(SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY)
-      }
-      if (state.accountInput.address === '') {
-        errorMessage.addressError.add(SIGN_UP_ADRESS_ERROR_MESSAGE_KEY)
-      }
-      else{
-        errorMessage.addressError.delete(SIGN_UP_ADRESS_ERROR_MESSAGE_KEY)
-      }
-      if (state.accountInput.phone === '') {
-        errorMessage.phoneError.add(SIGN_UP_PHONE_ERROR_MESSAGE_KEY)
-      }
-      else{
-        errorMessage.phoneError.delete(SIGN_UP_PHONE_ERROR_MESSAGE_KEY)
-      }
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY, emailFormatIsInvalid)
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_EMPTY_KEY, state.accountInput.email === '')
+      manageError(errorMessage.usernameError, SIGN_UP_USERNAME_ERROR_EMPTY_KEY, state.accountInput.username === '')
+      manageError(errorMessage.passwordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password === '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY, state.verifyPassword === '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password !== state.verifyPassword)
+      manageError(errorMessage.shopNameError, SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY, state.accountInput.shopName === '')
+      manageError(errorMessage.addressError, SIGN_UP_ADRESS_ERROR_MESSAGE_KEY, state.accountInput.address === '')
+      manageError(errorMessage.phoneError, SIGN_UP_PHONE_ERROR_MESSAGE_KEY, state.accountInput.phone === '')
       return {
         ...state,
         signUpErrorMessage: errorMessage
       }
+    }
+    case 'CHECK_ADDRESS': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.addressError, SIGN_UP_ADRESS_ERROR_MESSAGE_KEY, state.accountInput.address === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          addressError: errorMessage.addressError
+        }
+      }
+    }
+    case 'CHECK_PHONE': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.phoneError, SIGN_UP_PHONE_ERROR_MESSAGE_KEY, state.accountInput.phone === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          phoneError: errorMessage.phoneError
+        }
+      }
+    }
+    case 'CHECK_SHOP_NAME': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.shopNameError, SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY, state.accountInput.shopName === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          shopNameError: errorMessage.shopNameError
+        }
+      }
+    }
+    case 'CHECK_EMAIL': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      const emailFormatIsInvalid = !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(state.accountInput.email)
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY, emailFormatIsInvalid)
+      manageError(errorMessage.emailError, SIGN_UP_EMAIL_ERROR_EMPTY_KEY, state.accountInput.email === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          emailError: errorMessage.emailError
+        }
+      }
+    }
+    case 'CHECK_USERNAME': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.usernameError, SIGN_UP_USERNAME_ERROR_EMPTY_KEY, state.accountInput.username === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          usernameError: errorMessage.usernameError
+        }
+      }
+    }
+    case 'CHECK_PASSWORD': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.passwordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password === '')
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          passwordError: errorMessage.passwordError
+        }
+      }
+    }
+    case 'CHECK_CONFIRM_PASSWORD': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY, state.verifyPassword === '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password !== state.verifyPassword)
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          verifyPasswordError: errorMessage.verifyPasswordError
+        }
+      }
+    }
     case 'SET_USERNAME_AS_ALREADY_USED':
       state.signUpErrorMessage.usernameError.add(SIGN_UP_USERNAME_ERROR_USED_KEY)
       return {
@@ -156,7 +226,6 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
           usernameError: state.signUpErrorMessage.usernameError
         }
       }
-
     case 'SET_USERNAME_AS_UNUSED':
       state.signUpErrorMessage.usernameError.delete(SIGN_UP_USERNAME_ERROR_USED_KEY)
 
@@ -189,7 +258,17 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
     default:
       return state;
   }
+
 }
 
+const manageError = (errorSet: Set<string>, errorKey: string, errorCondition: boolean) => {
+  if (!errorCondition && errorSet.has(errorKey)) {
+    errorSet.delete(errorKey)
+  }
+  if (errorCondition && !errorSet.has(errorKey)) {
+    errorSet.add(errorKey)
+  }
+  return errorSet
+}
 
 

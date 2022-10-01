@@ -7,6 +7,13 @@ export type SignUpCredentialsReducerActions =
     | { type: 'CHANGE_PASSWORD', newPassword: string }
     | { type: 'CHANGE_CONFIRM_PASSWORD', newConfirmPassword: string }
     | { type: 'CHECK_SIGN_UP_CREDENTIALS'}
+    | { type: 'CHECK_EMAIL'}
+    | { type: 'CHECK_USERNAME'}
+    | { type: 'CHECK_PASSWORD'}
+    | { type: 'CHECK_CONFIRM_PASSWORD'}
+    | { type: 'CHECK_SHOP_NAME'}
+    | { type: 'CHECK_ADDRESS'}
+    | { type: 'CHECK_PHONE'}
     | { type: 'SET_USERNAME_AS_ALREADY_USED'}
     | { type: 'SET_EMAIL_AS_ALREADY_USED'}
     | { type: 'SET_USERNAME_AS_UNUSED'}
