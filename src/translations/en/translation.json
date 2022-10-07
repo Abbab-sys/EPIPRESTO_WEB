@@ -16,12 +16,14 @@
     "errorMessages": {
       "emailError": "The email or username field can not be empty",
       "passwordError": "The password can not be empty",
-      "credentialsError": "The email or the password is incorrect"
+      "credentialsError": "The email or the password is incorrect",
+      "notVerifiedEmail": "Email not verified !"
     }
   },
   "sign_up": {
     "createAccount": "Create an account",
-    "successAccountCreation": "Your account has been successfully created!",
+    "successAccountCreation": "Your account has been successfully created!\nNow please verify your e-mail",
+    "confirmEmail": "Please confirm your email address",
     "errorAccountCreation": "Oops something went wrong",
     "shopName": {
       "placeholder": "Shop name",

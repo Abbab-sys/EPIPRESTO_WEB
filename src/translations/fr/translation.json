@@ -16,12 +16,15 @@
     "errorMessages": {
       "emailError": "L'email ou le pseudonyme ne peut pas être vide",
       "passwordError": "Le mot de passe ne peut pas être vide",
-      "credentialsError": "L'email ou le mot de passe renseigné est incorrect"
-    }
+      "credentialsError": "L'email ou le mot de passe renseigné est incorrect",
+      "notVerifiedEmail": "Veuillez vérifiez votre e-mail"
+    },
+    "notVerifiedEmail": "Veuillez vérifiez votre e-mail"
   },
   "sign_up": {
     "createAccount": "Créer un compte",
-    "successAccountCreation": "Votre compte a été créé aves succès!",
+    "confirmEmail": "Confirmer l'email",
+    "successAccountCreation": "Votre compte a été créé aves succès!\nVeuillez vérifiez votre e-mail",
     "errorAccountCreation": "Oops une erreur est survenue",
     "shopName": {
       "placeholder": "Nom du marché",

@@ -12,6 +12,7 @@ import {useTranslation} from 'react-i18next';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Box, FormControl, InputLabel, MenuItem} from '@mui/material';
 import Protected from './pages/Protected';
+import ConfirmedEmail from "./pages/confirmed-email/ConfirmedEmail";
 
 const useStyles = makeStyles({
     root: {
@@ -37,7 +38,7 @@ function App() {
     const [language, setLanguage] = useState(i18n.language);
     const storeIdContext = {storeId, setStoreId};
     const httpLink = createHttpLink({
-        uri: 'http://localhost:4000/graphql',
+        uri: "https://epipresto.pagekite.me/graphql",
     });
     const authLink = setContext((_, {headers}) => {
         return {
@@ -79,6 +80,7 @@ function App() {
                             <Route path="*" element={<Navigate replace to="/login"/>}></Route>
                             <Route element={<Login/>} path="/login"></Route>
                             <Route element={<SignUp/>} path="/sign-up"></Route>
+                            <Route path="/verify/:token" element={<ConfirmedEmail/>} />
                             <Route element={
                                 <Protected>
                                     <Synchronisation/>

@@ -1,7 +1,7 @@
-import {Alert, Button, Grid, Snackbar, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
+import {Button, Grid, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
 import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useReducer} from 'react';
 import {useMutation} from '@apollo/client';
 import {SYNC_SHOPIFY, SYNC_WOOCOMMERCE} from '../../graphql/mutations';
 import {useTranslation} from 'react-i18next';
@@ -17,26 +17,25 @@ import {
   syncCredentialsReducer
 } from "./reducers/SyncCredentialsReducer";
 import {SyncCredentialsReducerState, initialSyncCredentialsStateReducer} from "./reducers/SyncCredentialsReducerState";
+import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
 
 const Synchronisation = () => {
   const {t: translation} = useTranslation('translation')
   const classesStyles = synchronisationStyles();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [syncError, setSyncError] = useState(false);
+  const [syncStatusSnackbar, {
+    open: openSyncStatusSnackbar,
+    update: updateSyncStatusSnackbar
+  }] = useSnackbar({
+    severity: 'error',
+    messageTranslationKey: SYNCHRONIZATION_ERROR_KEY
+  })
 
   const [{shopifyCredentials, errorMessage, apiType, woocommerceCredentials}, dispatchCredentialsState]
     = useReducer(syncCredentialsReducer, initialSyncCredentialsStateReducer);
 
   const [synchronizeShopifyStore] = useMutation(SYNC_SHOPIFY);
   const [synchronizeWoocommerceStore] = useMutation(SYNC_WOOCOMMERCE);
-
-  const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
 
   function areAllCredentialsFieldsValid(credsState: SyncCredentialsReducerState): boolean {
     if (credsState.apiType === ApiType.SHOPIFY) {
@@ -57,18 +56,28 @@ const Synchronisation = () => {
       let syncResponse = (apiType === ApiType.SHOPIFY)
         ? await synchronizeShopifyStore({variables: {shopifyCreds: shopifyCredentials}})
         : await synchronizeWoocommerceStore({variables: {woocommerceCreds: woocommerceCredentials}})
-      setSyncError(syncResponse.data.synchronizeShopifyStore.code !== 200)
-      setSnackbarOpen(true)
+      const syncSuccess = syncResponse.data.synchronizeShopifyStore.code !== 200
+      openSyncStatusSnackbar()
+      if (syncSuccess) updateSyncStatusSnackbar({
+        messageTranslationKey: SYNCHRONIZATION_SUCCESS_KEY,
+        severity: "success"
+      })
+      updateSyncStatusSnackbar({
+        messageTranslationKey: SYNCHRONIZATION_ERROR_KEY,
+        severity: "error"
+      })
+      return
     }
-    setSyncError(true)
-    setSnackbarOpen(true)
+    updateSyncStatusSnackbar({
+      messageTranslationKey: SYNCHRONIZATION_ERROR_KEY,
+      severity: "error"
+    })
+    openSyncStatusSnackbar()
   }
 
-  useEffect(() => {
-    document.onkeydown = (event) => {
-      if (event.key === "Enter") handleSynchronisation()
-    }
-  },);
+  document.onkeydown = (event) => {
+    if (event.key === "Enter") handleSynchronisation().then((r) => console.log(r))
+  }
 
   return (
     <Grid
@@ -142,7 +151,7 @@ const Synchronisation = () => {
                 })}
                 className={classesStyles.input}
                 error={errorMessage.shopDomainWooError.length > 0}
-                helperText={errorMessage.shopDomainWooError.length > 0?translation(errorMessage.shopDomainWooError):""}
+                helperText={errorMessage.shopDomainWooError.length > 0 ? translation(errorMessage.shopDomainWooError) : ""}
               ></TextField>
             </Grid>
             <Grid item className={classesStyles.innerForm} direction="row">
@@ -156,7 +165,7 @@ const Synchronisation = () => {
                 })}
                 className={classesStyles.input}
                 error={errorMessage.shopConsumerKeyError.length > 0}
-                helperText={errorMessage.shopConsumerKeyError.length > 0?translation(errorMessage.shopConsumerKeyError):""}
+                helperText={errorMessage.shopConsumerKeyError.length > 0 ? translation(errorMessage.shopConsumerKeyError) : ""}
               ></TextField>
             </Grid>
             <Grid item className={classesStyles.innerForm} direction="row">
@@ -170,7 +179,7 @@ const Synchronisation = () => {
                 })}
                 className={classesStyles.input}
                 error={errorMessage.shopConsumerSecretError.length > 0}
-                helperText={errorMessage.shopConsumerSecretError.length > 0?translation(errorMessage.shopConsumerSecretError):""}
+                helperText={errorMessage.shopConsumerSecretError.length > 0 ? translation(errorMessage.shopConsumerSecretError) : ""}
               ></TextField>
             </Grid>
           </>
@@ -181,19 +190,7 @@ const Synchronisation = () => {
           onClick={handleSynchronisation}>
           {translation(SYNCHRONIZATION_KEY)}
         </Button>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClosing}>
-          <Alert onClose={handleSnackbarClosing} severity={syncError ? "error" : "success"}
-                 sx={{width: '100%'}}>
-            {syncError ? (
-              translation(SYNCHRONIZATION_ERROR_KEY)
-            ) : (
-              translation(SYNCHRONIZATION_SUCCESS_KEY)
-            )}
-          </Alert>
-        </Snackbar>
+        {syncStatusSnackbar}
       </Grid>
     </Grid>
   )

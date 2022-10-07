@@ -1,12 +1,11 @@
-import {Alert, Button, Grid, TextField} from '@mui/material'
-import React, {useContext, useEffect, useReducer, useState} from 'react';
+import {Button, Grid, TextField} from '@mui/material'
+import React, { useReducer} from 'react';
 import logo from '../../assets/logo.png';
 import {useLazyQuery, useMutation} from '@apollo/client'
 import {SIGN_UP} from '../../graphql/mutations';
 import {useNavigate} from 'react-router-dom';
 import {IS_VENDOR_EMAIL_USED, IS_VENDOR_USERNAME_USED} from '../../graphql/queries';
 import {useTranslation} from 'react-i18next';
-import Snackbar from '@mui/material/Snackbar';
 import {signUpStyles} from "./SignUpStyles";
 import {initialSignUpCredentialsState} from "./reducers/SignUpCredentialsReducerState";
 import {signUpCredentialsReducer} from "./reducers/SignUpCredentialsReducer";
@@ -15,17 +14,17 @@ import {
   SIGN_UP_CONFIRM_PASSWORD_PLACEHOLDER_KEY,
   SIGN_UP_CREATE_ACCOUNT_KEY,
 
-  SIGN_UP_EMAIL_PLACEHOLDER_KEY,
-  SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
+  SIGN_UP_EMAIL_PLACEHOLDER_KEY, SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
   SIGN_UP_PASSWORD_PLACEHOLDER_KEY
-  , SIGN_UP_PHONE_PLACEHOLDER,
+  , SIGN_UP_PHONE_PLACEHOLDER_KEY,
 
-  SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY,
+  SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY, SIGN_UP_SUCCESS_ACCOUNT_CREATION_KEY,
 
   SIGN_UP_USERNAME_PLACEHOLDER_KEY
 } from "../../translations/keys/SignUpTranslationKeys";
-import {VendorContext} from '../../context/Vendor';
 import {useTimeout} from "../../hooks/CredentialsHooks";
+import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
+
 
 const SignUp = () => {
 
@@ -33,19 +32,48 @@ const SignUp = () => {
   const classes = signUpStyles()
   const navigate = useNavigate()
 
-  const {setStoreId} = useContext(VendorContext);
 
   const [{verifyPassword, accountInput, signUpErrorMessage}, dispatchCredentialsState]
     = useReducer(signUpCredentialsReducer, initialSignUpCredentialsState);
 
-  const [errorOpen, setErrorOpen] = useState(false);
+  const [confirmEmailSnackbar, {open: openConfirmEmailSnackbar, close: closeConfirmEmailSnackbar}] = useSnackbar({
+    severity: 'info',
+    messageTranslationKey: SIGN_UP_SUCCESS_ACCOUNT_CREATION_KEY
+  })
+  const [serverErrorSnackbar, {open: openServerErrorSnackbar, close: closeServerErrorSnackbar}] = useSnackbar({
+    severity: 'error',
+    messageTranslationKey: SIGN_UP_ERROR_ACCOUNT_CREATION_KEY
+  })
 
-  const [isEmailUsed, {loading: emailUsedLoading, data: emailUsedData}] = useLazyQuery(IS_VENDOR_EMAIL_USED);
-  const [isUsernameUsed, {
-    loading: usernameUsedLoading,
-    data: usernameUsedData
-  }] = useLazyQuery(IS_VENDOR_USERNAME_USED);
-  const [signUp, {data: signUpData}] = useMutation(SIGN_UP);
+  const handleEmailUsed = (emailUsedData: any) => {
+    if (!emailUsedData) return
+    (emailUsedData.isVendorEmailUsed)
+      ? dispatchCredentialsState({type: "SET_EMAIL_AS_ALREADY_USED"})
+      : dispatchCredentialsState({type: "SET_EMAIL_AS_UNUSED"})
+  }
+  const handleUsernameUsed = (usernameUsedData: any) => {
+    if (!usernameUsedData) return
+    (usernameUsedData.isVendorUsernameUsed)
+      ? dispatchCredentialsState({type: "SET_USERNAME_AS_ALREADY_USED"})
+      : dispatchCredentialsState({type: "SET_USERNAME_AS_UNUSED"})
+  }
+  const signUpResponse = (signUpData: any) => {
+    if (!signUpData) return
+    if (signUpData.vendorSignUp.code !== 200) {
+      closeConfirmEmailSnackbar()
+      openServerErrorSnackbar()
+      return;
+    }
+    closeServerErrorSnackbar()
+    openConfirmEmailSnackbar()
+    setTimeout(() => {
+      navigate("/login")
+    }, 5000)
+  }
+
+  const [isEmailUsed, {loading: emailUsedLoading}] = useLazyQuery(IS_VENDOR_EMAIL_USED, {onCompleted: handleEmailUsed});
+  const [isUsernameUsed, {loading: usernameUsedLoading}] = useLazyQuery(IS_VENDOR_USERNAME_USED, {onCompleted: handleUsernameUsed});
+  const [signUp] = useMutation(SIGN_UP, {onCompleted: signUpResponse});
 
   useTimeout({
     callback: isEmailUsed,
@@ -53,13 +81,6 @@ const SignUp = () => {
     callbackVars: {variables: {email: accountInput.email}},
     dependencies: [accountInput.email]
   })
-  useEffect(() => {
-    if (!emailUsedData) return
-    (emailUsedData.isVendorEmailUsed)
-      ? dispatchCredentialsState({type: "SET_EMAIL_AS_ALREADY_USED"})
-      : dispatchCredentialsState({type: "SET_EMAIL_AS_UNUSED"})
-  }, [emailUsedData])
-
 
   useTimeout({
     callback: isUsernameUsed,
@@ -67,30 +88,6 @@ const SignUp = () => {
     callbackVars: {variables: {username: accountInput.username}},
     dependencies: [accountInput.username]
   })
-  useEffect(() => {
-    if (!usernameUsedData) return
-    (usernameUsedData.isVendorUsernameUsed)
-      ? dispatchCredentialsState({type: "SET_USERNAME_AS_ALREADY_USED"})
-      : dispatchCredentialsState({type: "SET_USERNAME_AS_UNUSED"})
-  }, [usernameUsedData])
-
-
-  useEffect(() => {
-    if (!signUpData) return
-    if (signUpData.vendorSignUp.code === 200) {
-      setStoreId(signUpData.vendorSignUp.vendorAccount.store._id)
-      navigate("/synchronization")
-    } else {
-      setErrorOpen(true)
-    }
-  }, [navigate, setStoreId, signUpData])
-
-  const handleSnackbarClosing = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setErrorOpen(false);
-  };
 
   const areAllCredentialsFieldsValid = (): boolean => {
     const currErrorMessages = signUpErrorMessage;
@@ -124,8 +121,6 @@ const SignUp = () => {
     const areCredentialsValid = areAllCredentialsFieldsValid()
     if (areCredentialsValid) {
       signUp({variables: {accountInput: accountInput}}).then(r => console.log(r))
-    } else {
-      dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
     }
   }
   document.onkeydown = (event) => {
@@ -204,7 +199,7 @@ const SignUp = () => {
             variant='standard'
             className={classes.input}
             color="warning"
-            placeholder={translation(SIGN_UP_PHONE_PLACEHOLDER)}
+            placeholder={translation(SIGN_UP_PHONE_PLACEHOLDER_KEY)}
             value={accountInput.phone}
             onChange={(event) => dispatchCredentialsState({
               type: "CHANGE_PHONE",
@@ -252,15 +247,9 @@ const SignUp = () => {
         >
           {translation(SIGN_UP_CREATE_ACCOUNT_KEY)}
         </Button>
-        <Snackbar
-          open={errorOpen}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClosing}>
-          <Alert onClose={handleSnackbarClosing} severity="error" sx={{width: '100%'}}>
-            {translation(SIGN_UP_ERROR_ACCOUNT_CREATION_KEY)}
-          </Alert>
-        </Snackbar>
       </Grid>
+      {serverErrorSnackbar}
+      {confirmEmailSnackbar}
     </Grid>
   )
 }

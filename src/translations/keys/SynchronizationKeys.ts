@@ -1,14 +1,16 @@
-export const SYNCHRONIZATION_KEY="synchronization.synchronize";
-export const SYNCHRONIZATION_SUCCESS_KEY="synchronization.success";
-export const SYNCHRONIZATION_ERROR_KEY="synchronization.error";
-export const SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY="synchronization.domainName.placeholder";
-export const SYNCHRONIZATION_DOMAIN_NAME_ERROR_MESSAGE_KEY="synchronization.domainName.errorMessage";
-export const SYNCHRONIZATION_SHOPIFY_API_TOKEN_PLACEHOLDER_KEY="synchronization.shopify.apiToken.placeholder";
-export const SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY="synchronization.shopify.apiToken.errorMessage";
+import {TranslationKey} from "../../interfaces/TranslationInterface";
 
-export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_PLACEHOLDER_KEY="synchronization.woocommerce.consumerKey.placeholder";
-export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_ERROR_MESSAGE_KEY="synchronization.woocommerce.consumerKey.errorMessage";
-export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_PLACEHOLDER_KEY="synchronization.woocommerce.consumerSecret.placeholder";
-export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_ERROR_MESSAGE_KEY="synchronization.woocommerce.consumerSecret.errorMessage";
+export const SYNCHRONIZATION_KEY: TranslationKey = "synchronization.synchronize";
+export const SYNCHRONIZATION_SUCCESS_KEY: TranslationKey = "synchronization.success";
+export const SYNCHRONIZATION_ERROR_KEY: TranslationKey = "synchronization.error";
+export const SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY: TranslationKey = "synchronization.domainName.placeholder";
+export const SYNCHRONIZATION_DOMAIN_NAME_ERROR_MESSAGE_KEY: TranslationKey = "synchronization.domainName.errorMessage";
+export const SYNCHRONIZATION_SHOPIFY_API_TOKEN_PLACEHOLDER_KEY: TranslationKey = "synchronization.shopify.apiToken.placeholder";
+export const SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY: TranslationKey = "synchronization.shopify.apiToken.errorMessage";
+
+export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_PLACEHOLDER_KEY: TranslationKey = "synchronization.woocommerce.consumerKey.placeholder";
+export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_ERROR_MESSAGE_KEY: TranslationKey = "synchronization.woocommerce.consumerKey.errorMessage";
+export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_PLACEHOLDER_KEY: TranslationKey = "synchronization.woocommerce.consumerSecret.placeholder";
+export const SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_ERROR_MESSAGE_KEY: TranslationKey = "synchronization.woocommerce.consumerSecret.errorMessage";
 
 
