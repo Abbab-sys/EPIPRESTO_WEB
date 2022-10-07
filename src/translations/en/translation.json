@@ -83,5 +83,9 @@
         "errorMessage": "The consumer secret key can not be empty"
       }
     }
+  },
+  "email_verified": {
+    "message": "Your email has been verified!",
+    "login": "Log in"
   }
 }

@@ -12,6 +12,7 @@ import {useTranslation} from 'react-i18next';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Box, FormControl, InputLabel, MenuItem} from '@mui/material';
 import Protected from './pages/Protected';
+import EmailVerified from './pages/email_verified/EmailVerified';
 
 const useStyles = makeStyles({
     root: {
@@ -84,6 +85,7 @@ function App() {
                                     <Synchronisation/>
                                 </Protected>
                             } path="/synchronization"></Route>
+                            <Route element={<EmailVerified/>} path="/email-verified"></Route>
                         </Routes>
                     </Router>
                 </div>

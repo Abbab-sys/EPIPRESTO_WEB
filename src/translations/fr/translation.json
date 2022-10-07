@@ -83,5 +83,9 @@
         "errorMessage": "La clé secrète du consommateur ne peut pas être vide"
       }
     }
+  },
+  "email_verified": {
+    "message": "Votre email a été vérifié!",
+    "login": "Connectez-vous"
   }
 }
