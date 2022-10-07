@@ -13,6 +13,7 @@ import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Box, FormControl, InputLabel, MenuItem} from '@mui/material';
 import Protected from './pages/Protected';
 import ConfirmedEmail from "./pages/confirmed-email/ConfirmedEmail";
+import EmailVerified from './pages/email_verified/EmailVerified';
 
 const useStyles = makeStyles({
     root: {
@@ -86,6 +87,7 @@ function App() {
                                     <Synchronisation/>
                                 </Protected>
                             } path="/synchronization"></Route>
+                            <Route element={<EmailVerified/>} path="/email-verified"></Route>
                         </Routes>
                     </Router>
                 </div>
