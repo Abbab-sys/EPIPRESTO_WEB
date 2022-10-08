@@ -12,7 +12,6 @@ import {useTranslation} from 'react-i18next';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Box, FormControl, InputLabel, MenuItem} from '@mui/material';
 import Protected from './pages/Protected';
-import ConfirmedEmail from "./pages/confirmed-email/ConfirmedEmail";
 import EmailVerified from './pages/email_verified/EmailVerified';
 
 const useStyles = makeStyles({
@@ -81,13 +80,12 @@ function App() {
                             <Route path="*" element={<Navigate replace to="/login"/>}></Route>
                             <Route element={<Login/>} path="/login"></Route>
                             <Route element={<SignUp/>} path="/sign-up"></Route>
-                            <Route path="/verify/:token" element={<ConfirmedEmail/>} />
                             <Route element={
                                 <Protected>
                                     <Synchronisation/>
                                 </Protected>
                             } path="/synchronization"></Route>
-                            <Route element={<EmailVerified/>} path="/email-verified"></Route>
+                            <Route element={<EmailVerified/>} path="/verify/:token"></Route>
                         </Routes>
                     </Router>
                 </div>

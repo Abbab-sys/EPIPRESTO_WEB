@@ -77,7 +77,7 @@
     },
     "woocommerce": {
       "consumerKey": {
-        "placeholder":"Shop consumer key",
+        "placeholder": "Shop consumer key",
         "errorMessage": "The consumer key can not be empty"
       },
       "consumerSecret": {
