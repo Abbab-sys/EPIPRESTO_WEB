@@ -56,22 +56,21 @@ const Synchronisation = () => {
       let syncResponse = (apiType === ApiType.SHOPIFY)
         ? await synchronizeShopifyStore({variables: {shopifyCreds: shopifyCredentials}})
         : await synchronizeWoocommerceStore({variables: {woocommerceCreds: woocommerceCredentials}})
-      const syncSuccess = syncResponse.data.synchronizeShopifyStore.code !== 200
+      const syncSuccess = syncResponse.data.synchronizeShopifyStore.code === 200
       openSyncStatusSnackbar()
-      if (syncSuccess) updateSyncStatusSnackbar({
-        messageTranslationKey: SYNCHRONIZATION_SUCCESS_KEY,
-        severity: "success"
-      })
+      if (syncSuccess) {
+        updateSyncStatusSnackbar({
+          messageTranslationKey: SYNCHRONIZATION_SUCCESS_KEY,
+          severity: "success"
+        })
+        return
+      }
       updateSyncStatusSnackbar({
         messageTranslationKey: SYNCHRONIZATION_ERROR_KEY,
         severity: "error"
       })
       return
     }
-    updateSyncStatusSnackbar({
-      messageTranslationKey: SYNCHRONIZATION_ERROR_KEY,
-      severity: "error"
-    })
     openSyncStatusSnackbar()
   }
 
