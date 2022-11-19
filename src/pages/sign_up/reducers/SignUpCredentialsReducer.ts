@@ -3,6 +3,7 @@ import {SignUpCredentialsReducerActions} from "./SignUpCredentialsReducerActions
 import {initialSignUpErrorMessage} from "../../../interfaces/SignUpInterfaces";
 import {
   SIGN_UP_ADRESS_ERROR_MESSAGE_KEY,
+  SIGN_UP_CATEGORY_ERROR_KEY,
   SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY,
   SIGN_UP_EMAIL_ERROR_EMPTY_KEY,
   SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY, SIGN_UP_EMAIL_ERROR_USED_KEY,
@@ -120,6 +121,20 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
         }
       }
     }
+    case 'CHANGE_CATEGORY': {
+      const errorMessage = {...initialSignUpErrorMessage}
+      return {
+        ...state,
+        accountInput: {
+          ...state.accountInput,
+          shopCategory: action.newCategory
+        },
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          shopCategoryError: errorMessage.shopCategoryError
+        }
+      }
+    }
     case 'CHECK_SIGN_UP_CREDENTIALS': {
       const errorMessage = {...initialSignUpErrorMessage}
       const emailFormatIsInvalid = !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(state.accountInput.email)
@@ -132,6 +147,7 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
       manageError(errorMessage.shopNameError, SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY, state.accountInput.shopName === '')
       manageError(errorMessage.addressError, SIGN_UP_ADRESS_ERROR_MESSAGE_KEY, state.accountInput.address === '')
       manageError(errorMessage.phoneError, SIGN_UP_PHONE_ERROR_MESSAGE_KEY, state.accountInput.phone === '')
+      manageError(errorMessage.shopCategoryError, SIGN_UP_CATEGORY_ERROR_KEY, state.accountInput.shopCategory === '')
       return {
         ...state,
         signUpErrorMessage: errorMessage
@@ -216,6 +232,21 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
           verifyPasswordError: errorMessage.verifyPasswordError
         }
       }
+    }
+    case 'CHECK_CATEGORY': {
+      const errorMessage = {...initialSignUpErrorMessage};
+      manageError(
+        errorMessage.shopCategoryError,
+        SIGN_UP_CATEGORY_ERROR_KEY,
+        state.accountInput.shopCategory === '',
+      );
+      return {
+        ...state,
+        signUpErrorMessage: {
+          ...state.signUpErrorMessage,
+          shopCategoryError: errorMessage.shopCategoryError,
+        },
+      };
     }
     case 'SET_USERNAME_AS_ALREADY_USED':
       state.signUpErrorMessage.usernameError.add(SIGN_UP_USERNAME_ERROR_USED_KEY)

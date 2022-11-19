@@ -14,7 +14,8 @@ export const initialSignUpCredentialsState: SignUpCredentialsReducerState = {
     address: '',
     phone: '',
     username: '',
-    password: ''
+    password: '',
+    shopCategory: ''
   },
   signUpErrorMessage: {
     ...initialSignUpErrorMessage

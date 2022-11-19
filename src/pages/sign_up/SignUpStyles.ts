@@ -23,6 +23,12 @@ export const signUpStyles = makeStyles({
         justifyContent: "center",
         width: "90%",
     },
+    dropdown: {
+        width: "100%",
+        marginBottom: '15px !important',
+        marginRight: '15px !important',
+        marginLeft: '15px !important',
+    },
     input: {
         margin: '15px !important',
         width: "100%"

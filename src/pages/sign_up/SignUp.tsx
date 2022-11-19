@@ -1,5 +1,5 @@
-import {Button, Grid, TextField} from '@mui/material'
-import React, { useReducer} from 'react';
+import {Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from '@mui/material'
+import React, { useReducer, useState} from 'react';
 import logo from '../../assets/logo.png';
 import {useLazyQuery, useMutation} from '@apollo/client'
 import {SIGN_UP} from '../../graphql/mutations';
@@ -11,20 +11,19 @@ import {initialSignUpCredentialsState} from "./reducers/SignUpCredentialsReducer
 import {signUpCredentialsReducer} from "./reducers/SignUpCredentialsReducer";
 import {
   SIGN_UP_ADRESS_PLACEHOLDER_KEY,
+  SIGN_UP_CATEGORY_KEY,
   SIGN_UP_CONFIRM_PASSWORD_PLACEHOLDER_KEY,
   SIGN_UP_CREATE_ACCOUNT_KEY,
-
   SIGN_UP_EMAIL_PLACEHOLDER_KEY, SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
-  SIGN_UP_PASSWORD_PLACEHOLDER_KEY
-  , SIGN_UP_PHONE_PLACEHOLDER_KEY,
-
-  SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY, SIGN_UP_SUCCESS_ACCOUNT_CREATION_KEY,
-
-  SIGN_UP_USERNAME_PLACEHOLDER_KEY
+  SIGN_UP_PASSWORD_PLACEHOLDER_KEY,
+  SIGN_UP_PHONE_PLACEHOLDER_KEY,
+  SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY,
+  SIGN_UP_SUCCESS_ACCOUNT_CREATION_KEY,
+  SIGN_UP_USERNAME_PLACEHOLDER_KEY,
 } from "../../translations/keys/SignUpTranslationKeys";
 import {useTimeout} from "../../hooks/CredentialsHooks";
 import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
-
+import { Category } from '../../interfaces/SignUpInterfaces';
 
 const SignUp = () => {
 
@@ -97,7 +96,8 @@ const SignUp = () => {
       currErrorMessages.verifyPasswordError.size === 0 &&
       currErrorMessages.shopNameError.size === 0 &&
       currErrorMessages.addressError.size === 0 &&
-      currErrorMessages.phoneError.size === 0;
+      currErrorMessages.phoneError.size === 0 &&
+      currErrorMessages.shopCategoryError.size === 0;
   }
   const areAllCredentialsFieldsAreFilled = (): boolean => {
     return accountInput.shopName !== '' &&
@@ -106,7 +106,8 @@ const SignUp = () => {
       accountInput.password !== '' &&
       verifyPassword !== '' &&
       accountInput.address !== '' &&
-      accountInput.phone !== ''
+      accountInput.phone !== '' &&
+      accountInput.shopCategory !== ''
   }
 
   const submitButtonShouldBeDisabled = () => {
@@ -126,6 +127,7 @@ const SignUp = () => {
   document.onkeydown = (event) => {
     if (event.key === "Enter" && !submitButtonShouldBeDisabled()) handleCreateAccount()
   }
+
   return (
     <Grid
       container
@@ -151,6 +153,28 @@ const SignUp = () => {
             error={signUpErrorMessage.shopNameError.size > 0}
             helperText={signUpErrorMessage.shopNameError.size > 0 ? translation(signUpErrorMessage.shopNameError.values().next().value) : ""}
           />
+        </Grid>
+        <Grid item direction="row" className={classes.innerForm}>
+          <FormControl
+            color="warning"
+            variant="standard"
+            fullWidth
+            className={classes.dropdown}
+            >
+            <InputLabel variant='standard'>{translation(SIGN_UP_CATEGORY_KEY)}</InputLabel>
+            <Select
+              value={accountInput.shopCategory}
+              onChange={(event) => {
+                dispatchCredentialsState({
+                type: "CHANGE_CATEGORY",
+                newCategory: event.target.value as Category
+              })}}
+              >
+                {(Object.keys(Category) as Array<keyof typeof Category>).map((category) => (
+                  <MenuItem value={category}>{translation('sign_up.category.' + category)}</MenuItem>
+                ))}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item direction="row" className={classes.innerForm}>
           <TextField

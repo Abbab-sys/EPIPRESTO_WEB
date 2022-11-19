@@ -29,6 +29,18 @@
       "placeholder": "Shop name",
       "errorMessage": "The shop name field can not be empty"
     },
+    "category": {
+      "placeholder": "Shop's category",
+      "error": "The shop category can not be empty",
+      "FRUITS_AND_VEGETABLES": "Fruits and vegetables",
+      "FISH_AND_SEAFOOD": "Fish and seafood",
+      "HEALTHY": "Healthy food",
+      "KETO": "Keto",
+      "BAKERY": "Bakery",
+      "WORLD_PRODUCTS": "Products of the world",
+      "BUTCHER": "Butcher shop",
+      "OTHER": "Other"
+    },
     "username": {
       "placeholder": "Username",
       "errors": {

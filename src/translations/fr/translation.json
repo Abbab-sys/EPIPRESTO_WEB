@@ -30,6 +30,18 @@
       "placeholder": "Nom du marché",
       "errorMessage": "Le champ du nom du marché ne peut pas être vide"
     },
+    "category": {
+      "placeholder": "Catégorie de commerce",
+      "error": "Le champ de la catégorie de commerce ne peut pas être vide",
+      "FRUITS_AND_VEGETABLES": "Fruits et légumes",
+      "FISH_AND_SEAFOOD": "Poissons et fruits de mer",
+      "HEALTHY": "Produits santé",
+      "KETO": "Keto",
+      "BAKERY": "Boulangerie",
+      "WORLD_PRODUCTS": "Produits du monde",
+      "BUTCHER": "Boucherie",
+      "OTHER": "Autre"
+    },
     "username": {
       "placeholder": "Pseudonyme",
       "errors": {

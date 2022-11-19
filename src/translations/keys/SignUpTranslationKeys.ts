@@ -9,6 +9,17 @@ export const SIGN_UP_ERROR_ACCOUNT_CREATION_KEY:TranslationKey="sign_up.errorAcc
 export const SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY:TranslationKey="sign_up.shopName.placeholder";
 export const SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY:TranslationKey="sign_up.shopName.errorMessage";
 
+export const SIGN_UP_CATEGORY_KEY:TranslationKey="sign_up.category.placeholder";
+export const SIGN_UP_FRUITS_KEY:TranslationKey="sign_up.category.FRUITS_AND_VEGETABLES";
+export const SIGN_UP_FISH_KEY:TranslationKey="sign_up.category.FISH_AND_SEAFOOD";
+export const SIGN_UP_HEALTHY_KEY:TranslationKey="sign_up.category.HEALTHY";
+export const SIGN_UP_KETO_KEY:TranslationKey="sign_up.category.KETO";
+export const SIGN_UP_BAKERY_KEY:TranslationKey="sign_up.category.BAKERY";
+export const SIGN_UP_WORLD_KEY:TranslationKey="sign_up.category.WORLD_PRODUCTS";
+export const SIGN_UP_BUTCHER_KEY:TranslationKey="sign_up.category.BUTCHER";
+export const SIGN_UP_OTHER_KEY:TranslationKey="sign_up.category.OTHER";
+export const SIGN_UP_CATEGORY_ERROR_KEY:TranslationKey="sign_up.category.error";
+
 export const SIGN_UP_USERNAME_PLACEHOLDER_KEY:TranslationKey="sign_up.username.placeholder";
 export const SIGN_UP_USERNAME_ERROR_EMPTY_KEY:TranslationKey="sign_up.username.errors.empty";
 export const SIGN_UP_USERNAME_ERROR_USED_KEY:TranslationKey="sign_up.username.errors.used";
