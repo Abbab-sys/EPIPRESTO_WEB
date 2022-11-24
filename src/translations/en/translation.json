@@ -1,0 +1,105 @@
+{
+  "language": {
+    "en": "English",
+    "fr": "French",
+    "language": "Language"
+  },
+  "server": {
+    "error": "Oops something went wrong"
+  },
+  "login": {
+    "email": "Email or Username",
+    "password": "Password",
+    "login": "LOG IN",
+    "newTo": "New to Épipresto?",
+    "createAccount": "Create an account",
+    "errorMessages": {
+      "emailError": "The email or username field can not be empty",
+      "passwordError": "The password can not be empty",
+      "credentialsError": "The email or the password is incorrect",
+      "notVerifiedEmail": "Email not verified !"
+    }
+  },
+  "sign_up": {
+    "createAccount": "Create an account",
+    "successAccountCreation": "Your account has been successfully created!\nNow please verify your e-mail",
+    "confirmEmail": "Please confirm your email address",
+    "errorAccountCreation": "Oops something went wrong",
+    "shopName": {
+      "placeholder": "Shop name",
+      "errorMessage": "The shop name field can not be empty"
+    },
+    "category": {
+      "placeholder": "Shop's category",
+      "error": "The shop category can not be empty",
+      "FRUITS_AND_VEGETABLES": "Fruits and vegetables",
+      "FISH_AND_SEAFOOD": "Fish and seafood",
+      "HEALTHY": "Healthy food",
+      "KETO": "Keto",
+      "BAKERY": "Bakery",
+      "WORLD_PRODUCTS": "Products of the world",
+      "BUTCHER": "Butcher shop",
+      "OTHER": "Other"
+    },
+    "username": {
+      "placeholder": "Username",
+      "errors": {
+        "empty": "The username field can not be empty",
+        "used": "This username is already used"
+      }
+    },
+    "address": {
+      "placeholder": "Address",
+      "errorMessage": "The address field can not be empty"
+    },
+    "email": {
+      "placeholder": "Email",
+      "errors": {
+        "empty": "The email field can not be empty",
+        "formatError": "The email format is not correct",
+        "used": "This email is already used"
+      }
+    },
+    "phone": {
+      "placeholder": "Phone number",
+      "errorMessage": "The phone number field can not be empty"
+    },
+    "password": {
+      "placeholder": "Password",
+      "errorMessage": "The password field can not be empty"
+    },
+    "confirmPassword": {
+      "placeholder": "Confirm password",
+      "errorMessage": "The two passwords do not match"
+    }
+  },
+  "synchronization": {
+    "synchronize": "SYNCHRONIZE",
+    "success": "Your shop has been succesfully synchronized!",
+    "error": "One of the fields is incorrect",
+    "domainName": {
+      "placeholder": "Domain name",
+      "errorMessage": "The shop domain name can not be empty"
+    },
+    "shopify": {
+      "apiToken": {
+        "placeholder": "API Token",
+        "errorMessage": "The API Token can not be empty"
+      }
+    },
+    "woocommerce": {
+      "consumerKey": {
+        "placeholder": "Shop consumer key",
+        "errorMessage": "The consumer key can not be empty"
+      },
+      "consumerSecret": {
+        "placeholder": "Shop consumer secret key",
+        "errorMessage": "The consumer secret key can not be empty"
+      }
+    }
+  },
+  "email_verified": {
+    "message": "Your email has been verified!",
+    "login": "Log in"
+  }
+}
