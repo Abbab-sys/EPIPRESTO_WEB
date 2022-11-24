@@ -1,0 +1,106 @@
+{
+  "language": {
+    "en": "Anglais",
+    "fr": "Français",
+    "language": "Langue"
+  },
+  "server": {
+    "error": "Oops une erreur est survenue"
+  },
+  "login":{
+    "email": "Email ou Pseudonyme",
+    "password": "Mot de passe",
+    "login": "SE CONNECTER",
+    "newTo": "Nouveau chez Épipresto?",
+    "createAccount": "Créer un compte",
+    "errorMessages": {
+      "emailError": "L'email ou le pseudonyme ne peut pas être vide",
+      "passwordError": "Le mot de passe ne peut pas être vide",
+      "credentialsError": "L'email ou le mot de passe renseigné est incorrect",
+      "notVerifiedEmail": "Veuillez vérifiez votre e-mail"
+    },
+    "notVerifiedEmail": "Veuillez vérifiez votre e-mail"
+  },
+  "sign_up": {
+    "createAccount": "Créer un compte",
+    "confirmEmail": "Confirmer l'email",
+    "successAccountCreation": "Votre compte a été créé aves succès!\nVeuillez vérifiez votre e-mail",
+    "errorAccountCreation": "Oops une erreur est survenue",
+    "shopName": {
+      "placeholder": "Nom du marché",
+      "errorMessage": "Le champ du nom du marché ne peut pas être vide"
+    },
+    "category": {
+      "placeholder": "Catégorie de commerce",
+      "error": "Le champ de la catégorie de commerce ne peut pas être vide",
+      "FRUITS_AND_VEGETABLES": "Fruits et légumes",
+      "FISH_AND_SEAFOOD": "Poissons et fruits de mer",
+      "HEALTHY": "Produits santé",
+      "KETO": "Keto",
+      "BAKERY": "Boulangerie",
+      "WORLD_PRODUCTS": "Produits du monde",
+      "BUTCHER": "Boucherie",
+      "OTHER": "Autre"
+    },
+    "username": {
+      "placeholder": "Pseudonyme",
+      "errors": {
+        "empty": "Le champ du pseudonyme ne peut pas être vide",
+        "used": "Ce pseudonyme est déjà utilisé"
+      }
+    },
+    "address": {
+      "placeholder": "Adresse",
+      "errorMessage": "Le champ d'adresse ne peut pas être vide"
+    },
+    "email": {
+      "placeholder": "Email",
+      "errors": {
+        "empty": "Le champ d'email ne peut pas être vide",
+        "formatError": "Le format de l'email est incorrect",
+        "used": "Cet email est déjà utilisé"
+      }
+    },
+    "phone": {
+      "placeholder": "Numéro de téléphone",
+      "errorMessage": "Le champ du numéro de téléphone ne peut pas être vide"
+    },
+    "password": {
+      "placeholder": "Mot de passe",
+      "errorMessage": "Le champ du mot de passe ne peut pas être vide"
+    },
+    "confirmPassword": {
+      "placeholder": "Confirmez votre mot de passe",
+      "errorMessage": "Les deux mots de passe ne sont pas identiques"
+    }
+  },
+  "synchronization": {
+    "synchronize": "SYNCHRONISER",
+    "success": "Votre marché a été synchronisé avec succès!",
+    "error": "Un des champs renseignés est incorrect",
+    "domainName": {
+      "placeholder": "Nom de domaine",
+      "errorMessage" : "Le nom du domaine ne peut pas être vide"
+    },
+    "shopify": {
+      "apiToken": {
+        "placeholder": "API Token",
+        "errorMessage": "Le token API ne peut pas être vide"
+      }
+    },
+    "woocommerce": {
+      "consumerKey": {
+        "placeholder": "Clé de consommateur du marché",
+        "errorMessage": "La clé de consommateur ne peut pas être vide"
+      },
+      "consumerSecret": {
+        "placeholder": "Clé secrète du consommateur",
+        "errorMessage": "La clé secrète du consommateur ne peut pas être vide"
+      }
+    }
+  },
+  "email_verified": {
+    "message": "Votre email a été vérifié!",
+    "login": "Connectez-vous"
+  }
+}
