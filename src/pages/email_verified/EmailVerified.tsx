@@ -22,7 +22,7 @@ const EmailVerified = () => {
   }, [params.token, verifyEmail])
 
   useEffect(() => {
-    const tokenVerified = data.verifyAccount.code === 200
+    const tokenVerified = data?.verifyAccount.code === 200
     setTokenAsInactive(!tokenVerified)
   }, [data])
 
@@ -42,9 +42,9 @@ const EmailVerified = () => {
         <Typography>
           {translation(EMAIL_VERIFIED_MESSAGE_KEY)}
         </Typography>
-        {(data.verifyAccount.vendorAccount) && <Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
+        <Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
           {translation(EMAIL_VERIFIED_LOGIN_KEY)}
-        </Link>}
+        </Link>
       </Grid>
     </Grid>
   )
