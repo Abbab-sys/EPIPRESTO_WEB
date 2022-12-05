@@ -4,7 +4,7 @@
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
-        "url": "https://epipresto.pagekite.me/",
+        "url": "http://52.90.77.253:4000/",
         "headers": {
           "user-agent": "JS GraphQL"
         },

@@ -3,6 +3,7 @@
 schema {
     query: Query
     mutation: Mutation
+    subscription: Subscription
 }
 
 interface HttpResponseInterface {
@@ -10,9 +11,47 @@ interface HttpResponseInterface {
     message: String!
 }
 
+union AccountResponse = ClientAccountResponse | VendorAccountResponse
+
 type ActivesHours {
     endingHour: String!
     openingHour: String!
+}
+
+type AnalyticsResponse implements HttpResponseInterface {
+    code: Int!
+    message: String!
+    topProducts: [ProductVariant!]
+    totalOrders: Int
+    totalSales: Float
+}
+
+type Chat {
+    _id: ID!
+    messages: [Message!]!
+    relatedClient: ClientAccount!
+    relatedOrder: Order!
+    relatedVendor: Store!
+}
+
+type ClientAccount {
+    _id: ID!
+    address: String!
+    chats: [Chat!]!
+    email: String!
+    firstName: String!
+    lastName: String!
+    nearbyShops(distance: Float!): [Store!]!
+    orders: [Order!]!
+    password: String!
+    phone: String!
+    username: String!
+}
+
+type ClientAccountResponse implements HttpResponseInterface {
+    clientAccount: ClientAccount
+    code: Int!
+    message: String!
 }
 
 type Disponibility {
@@ -25,30 +64,75 @@ type HttpResponse implements HttpResponseInterface {
     message: String!
 }
 
+type Message {
+    _id: ID!
+    date: Date!
+    message: String!
+    relatedChat: Chat!
+    role: Role!
+    status: MessageStatus!
+}
+
 type Mutation {
     addNewProductToStore(newProduct: ProductInput!, storeId: ID!): HttpResponse!
     addNewVariantToProduct(newVariant: ProductVariantInput!, productId: ID!): HttpResponse!
+    addNewVariantsToProduct(newVariants: [ProductVariantInput!]!, productId: ID!): HttpResponse!
+    clientSignUp(accountInput: ClientAccountInput): HttpResponse!
     removeProductById(productId: ID!): HttpResponse!
     removeVariantById(productVariantId: ID!): HttpResponse!
+    removeVariantsByIds(productVariantsIds: [ID!]!): HttpResponse!
+    sendMessageToChat(message: MessageInput!): HttpResponse!
+    submitOrder(clientId: ID!, paymentMethod: PaymentMethod!, productsVariantsToOrder: [ProductOrderedInput!]!): OrderResponse!
     synchronizeShopifyStore(shopifyCreds: ShopifyCredentials!): HttpResponse!
     synchronizeWoocommerceStore(woocommerceCreds: WoocommerceCredentials!): HttpResponse!
+    updateClientAccount(clientId: ID!, fieldsToUpdate: UpdateClientAccount!): ClientAccountResponse!
+    updateOrderStatus(newStatus: OrderStatus!, orderId: ID!, storeId: ID!): HttpResponse!
     updateProduct(fieldsToUpdate: UpdateProduct!, productId: ID!): ProductResponse!
     updateProductVariant(fieldsToUpdate: UpdateProductVariant!, variantId: ID!): ProductVariantResponse!
+    updateProductsVariants(variantsToUpdate: [UpdateProductVariant!]!): HttpResponse!
     updateStore(fieldsToUpdate: UpdateStore!, storeId: ID!): StoreResponse!
     updateVendorAccount(fieldsToUpdate: UpdateVendorAccount!, vendorId: ID!): VendorAccountResponse!
     vendorSignUp(accountInput: VendorAccountInput): HttpResponse!
-    verifyVendorAccount(token: String!): VendorAccountResponse!
+    verifyAccount(token: String!): AccountResponse!
+    verifyClientAccount(token: String!): ClientAccountResponse!
+}
+
+type Order {
+    _id: ID!
+    deliveryFee: Float!
+    logs: [OrderLog!]!
+    orderNumber: String!
+    paymentMethod: PaymentMethod!
+    productsVariantsOrdered: [ProductVariantOrdered!]!
+    relatedChats: [Chat!]!
+    relatedClient: ClientAccount!
+    relatedVendors: [Store!]!
+    subOrdersStatus: [SubOrdersLog!]!
+    subTotal: Float!
+    taxs: Float!
+}
+
+type OrderLog {
+    status: OrderStatus
+    time: Date
+}
+
+type OrderResponse implements HttpResponseInterface {
+    code: Int!
+    message: String!
+    order: Order
 }
 
 type Product {
     _id: ID!
     brand: String
+    description: String
     imgSrc: String!
     published: Boolean!
     relatedStore: Store!
     tags: [String!]!
     title: String!
-    variants: [ProductVariant!]!
+    variants(first: Int, offset: Int!, searchText: String): [ProductVariant!]!
 }
 
 type ProductResponse implements HttpResponseInterface {
@@ -65,9 +149,17 @@ type ProductVariant {
     imgSrc: String!
     price: Float!
     relatedProduct: Product!
+    relatedStore: Store!
     sku: String
-    stock: Int!
+    stock: Float!
     taxable: Boolean!
+    variantTitle: String!
+}
+
+type ProductVariantOrdered {
+    discount: Float
+    quantity: Int!
+    relatedProductVariant: ProductVariant!
 }
 
 type ProductVariantResponse implements HttpResponseInterface {
@@ -77,27 +169,75 @@ type ProductVariantResponse implements HttpResponseInterface {
 }
 
 type Query {
+    getAnalytics(dateFrom: Date!, dateTo: Date!, idStore: ID!): AnalyticsResponse!
+    getClientAccountById(idClient: ID!): ClientAccountResponse!
+    getOrderById(idOrder: ID!): OrderResponse!
     getProductById(idProduct: ID!): ProductResponse!
     getProductVariantById(idVariant: ID!): ProductVariantResponse!
     getStoreById(idStore: ID!): StoreResponse!
+    getStoresByCategory(category: ShopCategory!, idClient: ID!): StoresResponse!
+    getStripe(variantsToOrder: [VariantToOrder!]!): StripeResponse!
+    isClientEmailUsed(email: String!): Boolean!
+    isClientUsernameUsed(username: String!): Boolean!
     isVendorEmailUsed(email: String!): Boolean!
     isVendorUsernameUsed(username: String!): Boolean!
+    loginClientByEmail(email: String!, password: String!): ClientAccountResponse!
+    loginClientByUsername(password: String!, username: String!): ClientAccountResponse!
     loginVendorByEmail(email: String!, password: String!): VendorAccountResponse!
     loginVendorByUsername(password: String!, username: String!): VendorAccountResponse!
+    searchProducts(search: String!): [Product!]!
+    searchStores(idClient: ID!, search: String!): [Store!]!
 }
 
 type Store {
     _id: ID!
     address: String!
+    chats: [Chat!]!
     disponibilities: [Disponibility!]!
+    isAdmin: Boolean
+    isOpen: Boolean!
+    isPaused: Boolean!
     name: String!
-    products(first: Int, offset: Int!): [Product!]!
+    orders(idOrder: ID): [Order!]!
+    products(first: Int, offset: Int!, searchText: String): [Product!]!
+    relatedVendor: VendorAccount!
+    shopCategory: String
 }
 
 type StoreResponse implements HttpResponseInterface {
     code: Int!
     message: String!
     store: Store
+}
+
+type StoresResponse implements HttpResponseInterface {
+    code: Int!
+    message: String!
+    stores: [Store!]
+}
+
+type Stripe {
+    customer: ID!
+    ephemeralKey: String!
+    paymentIntent: String!
+    publishableKey: String!
+}
+
+type StripeResponse implements HttpResponseInterface {
+    code: Int!
+    message: String!
+    stripe: Stripe
+}
+
+type SubOrdersLog {
+    relatedStore: Store!
+    status: OrderStatus!
+    time: Date
+}
+
+type Subscription {
+    addressChanged(clientId: ID!): ID!
+    messageSent(clientId: ID, storeId: ID): Message
 }
 
 type VendorAccount {
@@ -130,6 +270,77 @@ enum Day {
     WEDNESDAY
 }
 
+enum MessageStatus {
+    READ
+    RECEIVED
+    SENT
+}
+
+enum OrderStatus {
+    CLOSED
+    CONFIRMED
+    DELIVERED
+    IN_DELIVERY
+    WAITING_CONFIRMATION
+}
+
+enum PaymentMethod {
+    AMERICAN_EXPRESS
+    APPLE_PAY
+    BITCOIN
+    CASH
+    GOOGLE_PAY
+    MASTER_CARD
+    PAYPAL
+    VISA
+}
+
+enum Role {
+    ADMIN
+    CLIENT
+    VENDOR
+}
+
+enum ShopCategory {
+    BAKERY
+    BUTCHER
+    FISH_AND_SEAFOOD
+    FRUITS_AND_VEGETABLES
+    HEALTHY
+    KETO
+    OTHER
+    WORLD_PRODUCTS
+}
+
+"Date custom scalar type"
+scalar Date
+
+input ActivesHoursInput {
+    endingHour: String!
+    openingHour: String!
+}
+
+input ClientAccountInput {
+    address: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+    password: String!
+    phone: String!
+    username: String!
+}
+
+input DisponibilityInput {
+    activesHours: [ActivesHoursInput!]!
+    day: Day!
+}
+
+input MessageInput {
+    content: String!
+    relatedChatID: ID!
+    role: Role!
+}
+
 input ProductInput {
     brand: String
     description: String
@@ -138,6 +349,12 @@ input ProductInput {
     tags: [String!]!
     title: String!
     variants: [ProductVariantInput!]!
+}
+
+input ProductOrderedInput {
+    discount: Float
+    quantity: Int!
+    relatedProductVariantId: ID!
 }
 
 input ProductVariantInput {
@@ -156,8 +373,19 @@ input ShopifyCredentials {
     shopDomain: String!
 }
 
+input UpdateClientAccount {
+    address: String
+    email: String
+    firstName: String
+    lastName: String
+    password: String
+    phone: String
+    username: String
+}
+
 input UpdateProduct {
     brand: String
+    description: String
     imgSrc: String
     published: Boolean
     tags: [String!]
@@ -167,16 +395,19 @@ input UpdateProduct {
 input UpdateProductVariant {
     availableForSale: Boolean
     byWeight: Boolean
-    displayName: String
     imgSrc: String
     price: Float
     sku: String
     stock: Int
     taxable: Boolean
+    variantId: ID
+    variantTitle: String
 }
 
 input UpdateStore {
     address: String
+    disponibilities: [DisponibilityInput!]
+    isPaused: Boolean
     name: String
 }
 
@@ -187,16 +418,23 @@ input UpdateVendorAccount {
     username: String
 }
 
+input VariantToOrder {
+    quantity: Int!
+    variantId: ID!
+}
+
 input VendorAccountInput {
     address: String!
     email: String!
     password: String!
     phone: String!
+    shopCategory: String!
     shopName: String!
     username: String!
 }
 
 input WoocommerceCredentials {
-    apiToken: String!
+    consumerKey: String!
+    consumerSecretKey: String!
     shopDomain: String!
 }
