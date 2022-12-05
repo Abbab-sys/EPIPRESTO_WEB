@@ -42,9 +42,9 @@ const EmailVerified = () => {
         <Typography>
           {translation(EMAIL_VERIFIED_MESSAGE_KEY)}
         </Typography>
-        <Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
+        {data?.verifyAccount.vendorAccount?<Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
           {translation(EMAIL_VERIFIED_LOGIN_KEY)}
-        </Link>
+        </Link>:null}
       </Grid>
     </Grid>
   )
