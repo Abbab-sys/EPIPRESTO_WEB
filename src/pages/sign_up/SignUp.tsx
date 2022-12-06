@@ -1,5 +1,5 @@
-import {Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from '@mui/material'
-import React, { useReducer, useState} from 'react';
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from '@mui/material'
+import React, {useReducer} from 'react';
 import logo from '../../assets/logo.png';
 import {useLazyQuery, useMutation} from '@apollo/client'
 import {SIGN_UP} from '../../graphql/mutations';
@@ -14,7 +14,8 @@ import {
   SIGN_UP_CATEGORY_KEY,
   SIGN_UP_CONFIRM_PASSWORD_PLACEHOLDER_KEY,
   SIGN_UP_CREATE_ACCOUNT_KEY,
-  SIGN_UP_EMAIL_PLACEHOLDER_KEY, SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
+  SIGN_UP_EMAIL_PLACEHOLDER_KEY,
+  SIGN_UP_ERROR_ACCOUNT_CREATION_KEY,
   SIGN_UP_PASSWORD_PLACEHOLDER_KEY,
   SIGN_UP_PHONE_PLACEHOLDER_KEY,
   SIGN_UP_SHOP_NAME_PLACEHOLDER_KEY,
@@ -23,7 +24,13 @@ import {
 } from "../../translations/keys/SignUpTranslationKeys";
 import {useTimeout} from "../../hooks/CredentialsHooks";
 import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
-import { Category } from '../../interfaces/SignUpInterfaces';
+import {Category} from '../../interfaces/SignUpInterfaces';
+
+/*
+ * Name: Sign Up Page
+ * Description: This file contains the sign up page
+ * Author: Adam Naoui, Alessandro van Reusel and Zouhair Derouich
+ */
 
 const SignUp = () => {
 
@@ -121,7 +128,7 @@ const SignUp = () => {
     dispatchCredentialsState({type: 'CHECK_SIGN_UP_CREDENTIALS'});
     const areCredentialsValid = areAllCredentialsFieldsValid()
     if (areCredentialsValid) {
-      signUp({variables: {accountInput: accountInput}}).then(r => console.log(r))
+      signUp({variables: {accountInput: accountInput}})
     }
   }
   document.onkeydown = (event) => {
@@ -160,19 +167,20 @@ const SignUp = () => {
             variant="standard"
             fullWidth
             className={classes.dropdown}
-            >
+          >
             <InputLabel variant='standard'>{translation(SIGN_UP_CATEGORY_KEY)}</InputLabel>
             <Select
               value={accountInput.shopCategory}
               onChange={(event) => {
                 dispatchCredentialsState({
-                type: "CHANGE_CATEGORY",
-                newCategory: event.target.value as Category
-              })}}
-              >
-                {(Object.keys(Category) as Array<keyof typeof Category>).map((category) => (
-                  <MenuItem value={category}>{translation('sign_up.category.' + category)}</MenuItem>
-                ))}
+                  type: "CHANGE_CATEGORY",
+                  newCategory: event.target.value as Category
+                })
+              }}
+            >
+              {(Object.keys(Category) as Array<keyof typeof Category>).map((category) => (
+                <MenuItem value={category}>{translation('sign_up.category.' + category)}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>

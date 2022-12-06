@@ -1,23 +1,30 @@
 import {Button, Grid, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
 import shopify_logo from '../../assets/shopify_logo.png';
 import woocommerce_logo from '../../assets/woocommerce_logo.png';
-import React, {useReducer} from 'react';
+import {useReducer} from 'react';
 import {useMutation} from '@apollo/client';
 import {SYNC_SHOPIFY, SYNC_WOOCOMMERCE} from '../../graphql/mutations';
 import {useTranslation} from 'react-i18next';
 import {synchronisationStyles} from "./SynchronisationStyles";
 import {
-  SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY, SYNCHRONIZATION_ERROR_KEY, SYNCHRONIZATION_KEY,
-  SYNCHRONIZATION_SHOPIFY_API_TOKEN_PLACEHOLDER_KEY, SYNCHRONIZATION_SUCCESS_KEY,
+  SYNCHRONIZATION_DOMAIN_NAME_PLACEHOLDER_KEY,
+  SYNCHRONIZATION_ERROR_KEY,
+  SYNCHRONIZATION_KEY,
+  SYNCHRONIZATION_SHOPIFY_API_TOKEN_PLACEHOLDER_KEY,
+  SYNCHRONIZATION_SUCCESS_KEY,
   SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_PLACEHOLDER_KEY,
   SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_SECRET_PLACEHOLDER_KEY
 } from "../../translations/keys/SynchronizationKeys";
 import {ApiType} from "../../enums/SynchronizationEnums";
-import {
-  syncCredentialsReducer
-} from "./reducers/SyncCredentialsReducer";
-import {SyncCredentialsReducerState, initialSyncCredentialsStateReducer} from "./reducers/SyncCredentialsReducerState";
+import {syncCredentialsReducer} from "./reducers/SyncCredentialsReducer";
+import {initialSyncCredentialsStateReducer, SyncCredentialsReducerState} from "./reducers/SyncCredentialsReducerState";
 import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
+
+/*
+ * Name: Synchronization Page
+ * Description: This file contains the synchronization page
+ * Author: Adam Naoui, Alessandro van Reusel and Zouhair Derouich
+ */
 
 const Synchronisation = () => {
   const {t: translation} = useTranslation('translation')
@@ -91,7 +98,7 @@ const Synchronisation = () => {
           <ToggleButtonGroup
             value={apiType}
             exclusive
-            onChange={(event, newApiType) => {
+            onChange={(_, newApiType) => {
               dispatchCredentialsState({type: 'CHANGE_API', newApi: newApiType})
             }}
             style={{margin: '15px'}}

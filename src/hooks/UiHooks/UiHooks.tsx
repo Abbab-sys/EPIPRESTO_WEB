@@ -4,6 +4,12 @@ import {Alert, Snackbar} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {TranslationKey} from "../../interfaces/TranslationInterface";
 
+/*
+ * Name: Snackbar hook
+ * Description: This file contains the snackbar's hook which wraps the snackbar logic and styles
+ * Author: Adam Naoui
+ */
+
 export const useSnackbar = (init: SnackbarKind) => {
   const [isOpen, setIsOpen] = useState(false);
   const {t: translation} = useTranslation('translation')
