@@ -6,12 +6,20 @@ import {
   SIGN_UP_CATEGORY_ERROR_KEY,
   SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY,
   SIGN_UP_EMAIL_ERROR_EMPTY_KEY,
-  SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY, SIGN_UP_EMAIL_ERROR_USED_KEY,
+  SIGN_UP_EMAIL_ERROR_FORMAT_ERROR_KEY,
+  SIGN_UP_EMAIL_ERROR_USED_KEY,
   SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY,
   SIGN_UP_PHONE_ERROR_MESSAGE_KEY,
   SIGN_UP_SHOP_NAME_ERROR_MESSAGE_KEY,
-  SIGN_UP_USERNAME_ERROR_EMPTY_KEY, SIGN_UP_USERNAME_ERROR_USED_KEY
+  SIGN_UP_USERNAME_ERROR_EMPTY_KEY,
+  SIGN_UP_USERNAME_ERROR_USED_KEY
 } from "../../../translations/keys/SignUpTranslationKeys";
+
+/*
+ * Name: Sign Up Credentials Reducer
+ * Description: This file contains the sign up credentials reducer hook
+ * Author: Adam Naoui
+ */
 
 export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, action: SignUpCredentialsReducerActions): SignUpCredentialsReducerState {
   switch (action.type) {
@@ -110,7 +118,7 @@ export function signUpCredentialsReducer(state: SignUpCredentialsReducerState, a
     }
     case 'CHANGE_CONFIRM_PASSWORD': {
       const errorMessage = {...initialSignUpErrorMessage}
-      manageError(errorMessage.verifyPasswordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, action.newConfirmPassword=== '')
+      manageError(errorMessage.verifyPasswordError, SIGN_UP_PASSWORD_ERROR_MESSAGE_KEY, action.newConfirmPassword === '')
       manageError(errorMessage.verifyPasswordError, SIGN_UP_CONFIRM_PASSWORD_ERROR_MESSAGE_KEY, state.accountInput.password !== action.newConfirmPassword)
       return {
         ...state,

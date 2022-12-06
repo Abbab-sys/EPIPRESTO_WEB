@@ -2,7 +2,12 @@ import {SnackbarKind} from "./UiHooksInterfaces";
 import React, {useState} from "react";
 import {Alert, Snackbar} from "@mui/material";
 import {useTranslation} from "react-i18next";
-import {TranslationKey} from "../../interfaces/TranslationInterface";
+
+/*
+ * Name: Snackbar hook
+ * Description: This file contains the snackbar's hook which wraps the snackbar logic and styles
+ * Author: Adam Naoui
+ */
 
 export const useSnackbar = (init: SnackbarKind) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,8 +55,5 @@ export const useSnackbar = (init: SnackbarKind) => {
     close,
     update,
   }] as const
-
-}
-export const useTextInput = (value: string, standBy: { onStandBy: () => void, args: {}, time: number }, errorsSet: Set<TranslationKey>, onChange: (event: any) => void) => {
 
 }

@@ -1,5 +1,11 @@
 import {gql} from '@apollo/client'
 
+/*
+ * Name: Mutations
+ * Description: This file contains all the mutations used in the app
+ * Author: Adam Naoui and Zouhair Derouich
+ */
+
 export const SIGN_UP = gql`
     mutation Mutation($accountInput: VendorAccountInput) {
         vendorSignUp(accountInput: $accountInput) {
@@ -44,7 +50,7 @@ export const VERIFY_EMAIL = gql`
                     _id
                 }
             }
-            
+
         }
     }
 `

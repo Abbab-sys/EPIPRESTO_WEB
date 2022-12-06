@@ -1,5 +1,11 @@
 import {TranslationKey} from "../../interfaces/TranslationInterface";
 
+/*
+ * Name: Synchronization Translation Keys
+ * Description: This file contains the translation keys for the synchronization page
+ * Author: Adam Naoui
+ */
+
 export const SYNCHRONIZATION_KEY: TranslationKey = "synchronization.synchronize";
 export const SYNCHRONIZATION_SUCCESS_KEY: TranslationKey = "synchronization.success";
 export const SYNCHRONIZATION_ERROR_KEY: TranslationKey = "synchronization.error";

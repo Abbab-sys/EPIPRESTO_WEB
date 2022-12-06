@@ -8,6 +8,12 @@ import {VERIFY_EMAIL} from "../../graphql/mutations";
 import {useEffect, useState} from "react";
 import {EMAIL_VERIFIED_LOGIN_KEY, EMAIL_VERIFIED_MESSAGE_KEY} from "../../translations/keys/EmailVerifiedKeys";
 
+/*
+ * Name: Email verified
+ * Description: This file contains the page displayed after a user verifies his email
+ * Author: Adam Naoui and Zouhair Derouich
+ */
+
 const EmailVerified = () => {
   const params = useParams()
   const [isTokenInactive, setTokenAsInactive] = useState(false)
@@ -42,9 +48,10 @@ const EmailVerified = () => {
         <Typography>
           {translation(EMAIL_VERIFIED_MESSAGE_KEY)}
         </Typography>
-        {data?.verifyAccount.vendorAccount?<Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
-          {translation(EMAIL_VERIFIED_LOGIN_KEY)}
-        </Link>:null}
+        {data?.verifyAccount.vendorAccount ?
+          <Link style={{margin: 10}} className={classes.link} onClick={() => navigate("/login")}>
+            {translation(EMAIL_VERIFIED_LOGIN_KEY)}
+          </Link> : null}
       </Grid>
     </Grid>
   )
