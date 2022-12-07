@@ -9,11 +9,13 @@ import {useTranslation} from 'react-i18next';
 import {loginStyles} from "./LoginStyles";
 import {
   LOGIN_CREATE_ACCOUNT,
-  LOGIN_EMAIL_KEY, LOGIN_LOGIN_KEY, LOGIN_NEW_TO_APP_KEY, LOGIN_NOT_VERIFIED_EMAIL_KEY,
+  LOGIN_EMAIL_KEY,
+  LOGIN_LOGIN_KEY,
+  LOGIN_NEW_TO_APP_KEY,
+  LOGIN_NOT_VERIFIED_EMAIL_KEY,
   LOGIN_PASSWORD_KEY,
   SERVER_ERROR_KEY
 } from "../../translations/keys/LoginTranslationKeys";
-
 import {
   initialLoginCredentialsStateReducer,
   LoginCredentialsReducerState
@@ -22,6 +24,11 @@ import {loginCredentialsReducer} from "./reducers/LoginCredentialsReducer";
 import {useSnackbar} from "../../hooks/UiHooks/UiHooks";
 import {ApolloError} from "@apollo/client";
 
+/*
+ * Name: Login Page
+ * Description: This file contains the login page
+ * Author: Adam Naoui, Alessandro van Reusel and Zouhair Derouich
+ */
 
 const Login = () => {
   document.onkeydown = (event) => {
@@ -91,11 +98,19 @@ const Login = () => {
 
   const [loginByEmail, {
     loading: emailAuthLoading,
-  }] = useLazyQuery(LOGIN_BY_EMAIL, {onCompleted: onLoginByEmailCompleted, onError: onLoginError,fetchPolicy:'no-cache'});
+  }] = useLazyQuery(LOGIN_BY_EMAIL, {
+    onCompleted: onLoginByEmailCompleted,
+    onError: onLoginError,
+    fetchPolicy: 'no-cache'
+  });
 
   const [loginByUsername, {
     loading: usernameAuthLoading,
-  }] = useLazyQuery(LOGIN_BY_USERNAME, {onCompleted: onLoginByUsernameCompleted, onError: onLoginError,fetchPolicy:'no-cache'});
+  }] = useLazyQuery(LOGIN_BY_USERNAME, {
+    onCompleted: onLoginByUsernameCompleted,
+    onError: onLoginError,
+    fetchPolicy: 'no-cache'
+  });
 
   const areAllCredentialsFieldsValid = (credsState: LoginCredentialsReducerState): boolean => {
     return credsState.credentials.auth.length > 0 && credsState.credentials.password.length > 0

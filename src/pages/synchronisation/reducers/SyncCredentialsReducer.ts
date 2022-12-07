@@ -1,13 +1,18 @@
 import {ApiType} from "../../../enums/SynchronizationEnums";
-import {
-  initialSyncErrorMessage,
-} from "../../../interfaces/SynchronisationInterfaces";
+import {initialSyncErrorMessage,} from "../../../interfaces/SynchronisationInterfaces";
 import {
   SYNCHRONIZATION_DOMAIN_NAME_ERROR_MESSAGE_KEY,
-  SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY, SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_ERROR_MESSAGE_KEY
+  SYNCHRONIZATION_SHOPIFY_API_TOKEN_ERROR_MESSAGE_KEY,
+  SYNCHRONIZATION_WOOCOMMERCE_CONSUMER_KEY_ERROR_MESSAGE_KEY
 } from "../../../translations/keys/SynchronizationKeys";
 import {SyncCredentialsReducerState} from "./SyncCredentialsReducerState";
 import {SyncCredentialsStateReducerAction} from "./SyncCredentialsReducerActions";
+
+/*
+ * Name: Synchronization Credentials Reducer
+ * Description: This file contains the synchronization credentials reducer hook
+ * Author: Adam Naoui
+ */
 
 export function syncCredentialsReducer(state: SyncCredentialsReducerState, action: SyncCredentialsStateReducerAction): SyncCredentialsReducerState {
   switch (action.type) {

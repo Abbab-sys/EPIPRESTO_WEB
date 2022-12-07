@@ -1,5 +1,11 @@
 import {TranslationKey} from "../../interfaces/TranslationInterface";
 
+/*
+ * Name: Login Translation Keys
+ * Description: This file contains the translation keys for the login page
+ * Author: Adam Naoui
+ */
+
 export const LOGIN_EMAIL_KEY: TranslationKey = "login.email";
 export const LOGIN_PASSWORD_KEY: TranslationKey = "login.password";
 export const LOGIN_LOGIN_KEY: TranslationKey = "login.login";

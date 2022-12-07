@@ -1,5 +1,11 @@
 import {makeStyles} from "@mui/styles";
 
+/*
+ * Name: Email verified page's styles
+ * Description: This file contains the the email verified page's styles
+ * Author: Zouhair Derouich
+ */
+
 export const emailVerifiedStyles = makeStyles({
   root: {
     background: "linear-gradient(135deg, rgb(255, 88, 88), rgb(240, 152, 25))",
@@ -29,7 +35,7 @@ export const emailVerifiedStyles = makeStyles({
   },
   link: {
     '&:hover': {
-        cursor: 'pointer'
+      cursor: 'pointer'
     }
   },
   button: {

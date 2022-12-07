@@ -1,5 +1,11 @@
 import { gql } from '@apollo/client'
 
+/*
+ * Name: Queries
+ * Description: This file contains all the queries used in the app
+ * Author: Adam Naoui and Zouhair Derouich
+ */
+
 export const LOGIN_BY_EMAIL = gql`
   query Query($email: String!, $password: String!) {
     loginVendorByEmail(email: $email, password: $password) {
